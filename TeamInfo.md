@@ -10,9 +10,9 @@
 | Captain     |  dodich3@illinois.edu  |
 | Member1     |        Yejun Park      |
 | Member1     |   yejunp2@illinois.edu |
-| Member2     |    Evan xxxxx          |
+| Member2     |        Evan Simon      |
 | Member2     |  evanes2@illinois.edu  |
-| Member3     |         xx xx          |
+| Member3     |        Vincent Do      |
 | Member3     |  vmdo2@illinois.edu    |
 
 ## Project Information
