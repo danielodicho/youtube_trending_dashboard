@@ -1,5 +1,6 @@
 **Describe what data is stored in the database. (Where is the data from, and what attributes and information would be stored?)**
-    - According to Variety magazine, “To determine the year’s top-trending videos, YouTube uses a combination of factors including measuring users interactions (number of views, shares, comments and likes). Note that they’re not the most-viewed videos overall for the calendar year”. This dataset includes a wide range of metrics, (ex:video_id, title, publishedAt, channelId, channelTitle, categoryId, trending_date, tags, view_count	, likes, dislikes, comment_count, thumbnail_link, comments_disabled, ratings_disabled, description)
+
+-According to Variety magazine, “To determine the year’s top-trending videos, YouTube uses a combination of factors including measuring users interactions (number of views, shares, comments and likes). Note that they’re not the most-viewed videos overall for the calendar year”. This dataset includes a wide range of metrics, (ex:video_id, title, publishedAt, channelId, channelTitle, categoryId, trending_date, tags, view_count	, likes, dislikes, comment_count, thumbnail_link, comments_disabled, ratings_disabled, description)
 The direct source for the data can be found here. 
 
 **What are the basic functions of your web application? (What can users of this website do? Which simple and complex features are there?)**
