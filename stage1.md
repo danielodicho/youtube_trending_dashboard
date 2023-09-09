@@ -39,8 +39,6 @@ A low-fidelity UI mockup: What do you imagine your final application’s interfa
 Project work distribution: Who would be responsible for each of the tasks or subtasks?
 List of the person responsible for which exact functionalities in section 6. Explain how backend systems will be distributed across members. Be as specific as possible as this could be part of the final peer evaluation metrics.
 
-Certainly! Given the detailed requirements for Stage 4 of your project, which involves building a web application using the YouTube trending dataset, here's how the work could be distributed among the four team members: Vincent, Evan, Daniel, and Yejun.
-
 ### Section 6: Work Distribution
 
 #### Frontend Development
