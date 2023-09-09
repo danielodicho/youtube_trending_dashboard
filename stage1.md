@@ -19,6 +19,7 @@ The direct source for the data can be found here.
 
 **Project Title**
 - Tracking YouTube Trends
+
 **Project Summary:  It should be a 1-2 paragraph description of what your project is.**
 
 - Our project utilizes the [Youtube trending data set](https://www.kaggle.com/datasets/rsrishav/youtube-trending-video-dataset?select=US_youtube_trending_data.csv) that contains several months (and counting) of data on daily trending YouTube videos. We can use the attributes of the data set to possibly determine patterns and formulas to increase the chances of a Youtube video going viral. To help solve this problem, we will need to implement sorting functions, such as searching data by range date or sorting data by view count in ascending or descending order.
