@@ -1,6 +1,3 @@
-TODO 5,6/7,8,9.1,9.2
-Done 1,2,3,4,6/7
-
 Describe what data is stored in the database. (Where is the data from, and what attributes and information would be stored?)
 According to Variety magazine, “To determine the year’s top-trending videos, YouTube uses a combination of factors including measuring users interactions (number of views, shares, comments and likes). Note that they’re not the most-viewed videos overall for the calendar year”. This dataset includes a wide range of metrics, (ex:video_id, title, publishedAt, channelId, channelTitle, categoryId, trending_date, tags, view_count	, likes, dislikes, comment_count, thumbnail_link, comments_disabled, ratings_disabled, description)
 The direct source for the data can be found here. 
