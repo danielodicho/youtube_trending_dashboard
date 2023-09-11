@@ -44,6 +44,9 @@ A low-fidelity UI mockup: What do you imagine your final application’s interfa
 Project work distribution: Who would be responsible for each of the tasks or subtasks?
 List of the person responsible for which exact functionalities in section 6. Explain how backend systems will be distributed across members. Be as specific as possible as this could be part of the final peer evaluation metrics.**
 
+![image](https://github.com/cs411-alawini/fa23-cs411-team022-2teamsof2/assets/63880449/73ad141c-12b8-4a2f-a6f9-f5dcfc9c67c9)
+
+
 #### Frontend Development
 
 1. **User Interface Design**
