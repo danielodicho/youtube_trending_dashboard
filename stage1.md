@@ -7,6 +7,8 @@ The direct source for the data can be found here.
 
 ### Simple Features:
 - Filter Data: Users can filter data based on various categories like channelTitle, categoryId, and trending_date.
+- Update Data: Users can update incorrect or changed information, such as a YouTuber changing their name. 
+- Delete Data: Users can delete data they do not want or find irrelivant to narrow their search and results.
 - Sort Data: Users can sort the data in ascending or descending order based on metrics like view_count, likes, and dislikes.
 - Hide Columns: Users can customize their view by hiding irrelevant columns.
 ### Complex Features:
