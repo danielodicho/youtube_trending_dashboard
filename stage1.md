@@ -48,6 +48,7 @@ List of the person responsible for which exact functionalities in section 6. Exp
 
 ![image](https://github.com/cs411-alawini/fa23-cs411-team022-2teamsof2/assets/71240971/c3b2a60b-a887-4dbd-826e-723e300fb8ed)
 
+We will also enable the users to update and delete data.
 
 #### Frontend Development
 
