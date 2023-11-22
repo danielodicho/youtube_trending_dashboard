@@ -1,0 +1,39 @@
+import re
+import json
+
+# Sample data
+sql_data = """
+INSERT INTO `Region` VALUES (1,'United States'),(2,'India'),(3,'Great Britain'),(4,'Germany'),(5,'Canada'),(6,'France'),(7,'Russia'),(8,'Brazil'),(9,'Mexico'),(10,'South Korea'),(11,'Japan');
+"""
+
+# Function to convert SQL to JSON
+def sql_to_json(sql_data, model_name):
+    # Regular expression to capture values within parentheses
+    values_pattern = re.compile(r'\(([^)]+)\)')
+    matches = values_pattern.findall(sql_data)
+
+    json_data = []
+    for match in matches:
+        pk, field = match.split(',', 1)
+        # Cleaning and formatting the field data
+        field = field.strip().strip("'")
+        json_object = {
+            "model": model_name,
+            "pk": int(pk),
+            "fields": {
+                "region_name": field
+            }
+        }
+        json_data.append(json_object)
+
+    return json_data
+
+# Model name in the format 'app_label.model_name'
+model_name = "youtube.Region"  # Replace 'yourapp' with your actual app label
+
+# Convert SQL to JSON
+json_output = sql_to_json(sql_data, model_name)
+
+# Output JSON to a file
+with open('region_fixture.json', 'w') as file:
+    json.dump(json_output, file, indent=4)
