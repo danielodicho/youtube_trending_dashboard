@@ -8,6 +8,7 @@ from rest_framework import viewsets
 class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
+    
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
