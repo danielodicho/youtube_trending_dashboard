@@ -1,0 +1,20 @@
+.noResults {
+	text-align: center;
+	padding: 20px;
+  }
+  
+  .listItem {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+  
+	&:last-child {
+	  border-bottom: none;
+	}
+  
+	.characterName {
+	  margin-left: 10px;
+	}
+  }
+  
