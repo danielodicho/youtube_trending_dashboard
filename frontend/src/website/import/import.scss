@@ -1,0 +1,18 @@
+.import-button {
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+  
+    &:hover {
+      background-color: #2980b9;
+    }
+  }
+  
+  #file-input {
+    display: none;
+  }
+  
