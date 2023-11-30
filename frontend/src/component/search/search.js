@@ -3,11 +3,14 @@ import React, { Component } from 'react';
 import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
 import TableView from '../tableView/tableView';
-import { Link } from 'react-router-dom';
-import './Search.scss';
+import './search.scss';
 
 const sortOptions = [
-  { key: 'title', text: 'Title', value: 'title' }
+  { key: 'title', text: 'Title', value: 'title' },
+  { key: 'views', text: 'Views', value: 'views' },
+  { key: 'trendingDate', text: 'TrendingDate', value: 'trendingDate' },
+  { key: 'categoryId', text: 'CategoryId', value: 'categoryId' },
+  { key: 'channelTitle', text: 'ChannelTitle', value: 'channelTitle' },
 ];
 
 class Search extends Component {
@@ -35,30 +38,29 @@ class Search extends Component {
   }
 
   async clickHandler() {
-    const response = await axios.get(this.baseUrl);
-    const allPokemonEntries = response.data.pokemon_entries;
+    // const response = await axios.get(this.baseUrl);
+    // const allPokemonEntries = response.data.pokemon_entries;
 
-    const matchedEntries = allPokemonEntries.filter(entry =>
-      entry.pokemon_species.name.toLowerCase().includes(this.state.value.toLowerCase())
-    );
+    const matchedEntries = []
+    // const matchedEntries = allPokemonEntries.filter(entry =>
+    //   entry.pokemon_species.name.toLowerCase().includes(this.state.value.toLowerCase())
+    // );
 
-    const matchedPokemonData = matchedEntries.map(entry => ({
-      entry_number: entry.entry_number,
-      pokemon_species: {
-        name: entry.pokemon_species.name,
-        url: entry.pokemon_species.url,
-      },
+    const videoListSorted = matchedEntries.map(video => ({
+      videoTitle: video.videoTitle
+      // add more stuff here
     }));
-    if (this.state.sort === "name") {
-      matchedPokemonData.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name));
+    if (this.state.sort === "title") {
+      // Do title sort
+      // matchedPokemonData.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name));
     }
     
     if (this.state.order === "Descending") {
-      matchedPokemonData.reverse();
+      videoListSorted.reverse();
     }
 
     this.setState({
-      matchedPokemon: matchedPokemonData,
+      videoList: videoListSorted,
     });
   }
 
@@ -82,21 +84,17 @@ class Search extends Component {
   render() {
     return (
       <div>
-        <div className="container">
+        {/* <div className="container">
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/2560px-International_Pok%C3%A9mon_logo.svg.png"
             className="small-image"
           />
-        </div>
-        <div className="menu">
-          <Link to="/">Search</Link>
-          <Link to="/gallery">Gallery</Link>
-        </div>
+        </div> */}
         <div className="search-container">
           <div className="searchbar">
             <Input
               onChange={this.searchHandler}
-              placeholder='Search a Pokémon here'
+              placeholder='Search for YouTuber here'
               value={this.state.value}
               className="searchbar-input"
             />
