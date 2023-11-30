@@ -1,18 +1,23 @@
 .import-button {
-    padding: 10px;
-    background-color: #3498db;
-    color: #fff;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-  
-    &:hover {
-      background-color: #2980b9;
-    }
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #2980b9;
   }
-  
-  #file-input {
-    display: none;
-  }
-  
+}
+
+#file-input {
+  display: none;
+}
+
+.import-container {
+  position: absolute;
+  top: 200px;
+  left: 40px;
+}

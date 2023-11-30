@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
 import TableView from '../tableView/tableView';
+import Import from '../import/import'; 
 import './search.scss';
 
 const sortOptions = [
@@ -81,6 +82,11 @@ class Search extends Component {
     });
   }
 
+  handleImport = (importedData) => {
+    // Handle the imported JSON data (e.g., update state with new data)
+    console.log('Imported JSON data:', importedData);
+  };
+
   render() {
     return (
       <div>
@@ -90,6 +96,7 @@ class Search extends Component {
             className="small-image"
           />
         </div> */}
+        <Import />
         <div className="search-container">
           <div className="searchbar">
             <Input
@@ -101,7 +108,6 @@ class Search extends Component {
             <Button className='search-button' onClick={this.clickHandler}>Search</Button>
           </div>
         </div>
-
         <div className='sort-dropdown'>
           <Dropdown
             placeholder="Sort by"
