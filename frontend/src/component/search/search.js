@@ -91,7 +91,6 @@ class Search extends Component {
   render() {
     return (
       <div>
-        <Import />
         <div className="search-container">
           <div className="searchbar">
             <Input
@@ -138,6 +137,8 @@ class Search extends Component {
             </label>
           </span>
         </div>
+
+        <Import />
 
         <Table youtubeData={this.state.videoList} />
       </div>
