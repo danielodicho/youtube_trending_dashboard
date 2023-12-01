@@ -1,0 +1,34 @@
+.search-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 20px;
+  }
+  
+  .searchbar {
+	display: flex;
+	align-items: center;
+  }
+  
+  .searchbar-input {
+	margin-right: 10px;
+  }
+  
+  .sort-dropdown {
+	text-align: center;
+	margin: 10px 0;
+  }
+  
+  .order-radio {
+	display: flex;
+	justify-content: center;
+	margin: 10px 0;
+  }
+  
+  .search-button {
+	background-color: #007acc;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	cursor: pointer;
+  }
