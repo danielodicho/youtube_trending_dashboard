@@ -30,10 +30,13 @@ class Video(models.Model):
     comments_disabled = models.BooleanField(blank=True, null=True)
     ratings_disabled = models.BooleanField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    channel = models.ForeignKey('YouTuber', on_delete=models.CASCADE, db_column='channelId', blank=True, null=True)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, db_column='region_id', blank=True, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='categoryId', blank=True, null=True)
+    channel = models.ForeignKey('YouTuber', on_delete=models.CASCADE, blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
 
 class YouTuber(models.Model):
     channel_id = models.CharField(max_length=256, primary_key=True)
     channel_title = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.channel_title
