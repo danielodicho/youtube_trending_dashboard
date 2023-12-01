@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import TableView from '../tableView/tableView';
 import { Dropdown } from 'semantic-ui-react';
 
+import './table.scss';
+
 class Table extends Component {
   constructor(props) {
     super(props);
@@ -56,14 +58,30 @@ class Table extends Component {
     return (
       <div className="tableContainer">
         <div className="tableHeader">
-          <div>Title {this.renderSortDropdown('video_title')}</div>
-          <div>Views {this.renderSortDropdown('views')}</div>
-          <div>Trending Date {this.renderSortDropdown('trending_date')}</div>
-          <div>Category ID {this.renderSortDropdown('category_id')}</div>
-          <div>Channel Title {this.renderSortDropdown('channel_title')}</div>
-          <div>Views/Likes Ratio {this.renderSortDropdown('views_likes_ratio')}</div>
-          <div>Click Rate {this.renderSortDropdown('click_rate')}</div>
-          <div>Tags {this.renderSortDropdown('tags')}</div>
+          <div className="columnHeader">
+            <span>Title</span>
+          </div>
+          <div className="columnHeader">
+            <span>Views</span>
+          </div>
+          <div className="columnHeader">
+            <span>Trending Date</span>
+          </div>
+          <div className="columnHeader">
+            <span>Category ID</span>
+          </div>
+          <div className="columnHeader">
+            <span>Channel Title</span>
+          </div>
+          <div className="columnHeader">
+            <span>Views/Likes Ratio</span>
+          </div>
+          <div className="columnHeader">
+            <span>Click Rate</span>
+          </div>
+          <div className="columnHeader">
+            <span>Tags</span>
+          </div>
         </div>
         <TableView youtubeData={youtubeData} />
       </div>

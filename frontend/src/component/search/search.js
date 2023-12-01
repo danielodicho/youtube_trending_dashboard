@@ -1,4 +1,3 @@
-// ignore this file for now
 import React, { Component } from 'react';
 import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
@@ -92,12 +91,6 @@ class Search extends Component {
   render() {
     return (
       <div>
-        {/* <div className="container">
-          <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/2560px-International_Pok%C3%A9mon_logo.svg.png"
-            className="small-image"
-          />
-        </div> */}
         <Import />
         <div className="search-container">
           <div className="searchbar">
@@ -146,9 +139,7 @@ class Search extends Component {
           </span>
         </div>
 
-        <Table>
-
-        </Table>
+        <Table youtubeData={this.state.videoList} />
       </div>
     );
   }

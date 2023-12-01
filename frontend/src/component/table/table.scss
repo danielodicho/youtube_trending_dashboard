@@ -1,3 +1,33 @@
+.tableContainer {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  margin: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+
+  .columnHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 20px;
+
+    span {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+/* Add the following rule to create space between Import and Table */
+.import-container {
+  margin-bottom: 20px;
+}
 .tableViewContainer {
     padding: 20px;
     background-color: #f9f9f9;
