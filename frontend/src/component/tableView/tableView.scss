@@ -13,8 +13,24 @@
 	  border-bottom: none;
 	}
   
-	.characterName {
-	  margin-left: 10px;
+	.content {
+	  flex: 1;
+	  overflow: hidden;
+  
+	  .infoContainer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center; /* Align items vertically in the middle */
+	  }
+  
+	  .infoItem {
+		flex: 1; /* Distribute the space equally among infoItems */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin: 5px 0;
+		padding: 0 10px; /* Add padding for better visual separation */
+	  }
 	}
   }
   
