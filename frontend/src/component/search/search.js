@@ -1,9 +1,10 @@
-// ignore this file for now
 import React, { Component } from 'react';
 import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
 import TableView from '../tableView/tableView';
-import Import from '../import/import'; 
+import Import from '../import/import';
+import Table from '../table/table'; 
+
 import './search.scss';
 
 const sortOptions = [
@@ -90,13 +91,6 @@ class Search extends Component {
   render() {
     return (
       <div>
-        {/* <div className="container">
-          <Image
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/2560px-International_Pok%C3%A9mon_logo.svg.png"
-            className="small-image"
-          />
-        </div> */}
-        <Import />
         <div className="search-container">
           <div className="searchbar">
             <Input
@@ -144,9 +138,9 @@ class Search extends Component {
           </span>
         </div>
 
-        <Container className='galleryContainer'>
-          <TableView matchedPokemonData={this.state.matchedPokemon} />
-        </Container>
+        <Import />
+
+        <Table youtubeData={this.state.videoList} />
       </div>
     );
   }
