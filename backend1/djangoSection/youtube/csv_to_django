@@ -1,0 +1,45 @@
+import os
+import django
+import pandas as pd
+
+# Set up the Django environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoSection.settings')
+django.setup()
+
+from youtube.models import Video, YouTuber, Category, Region
+
+def run():
+    # Assuming the CSV file is in the same directory as this script
+    csv_file_path = os.path.join(os.path.dirname(__file__), 'US_youtube_trending_data1.csv')
+
+    # Read the CSV file
+    data = pd.read_csv(csv_file_path)
+
+    # Iterate over the rows of the dataframe
+    for index, row in data.iterrows():
+        # Assuming you have a matching channel and category, otherwise you will need to create them
+        channel, _ = YouTuber.objects.get_or_create(channel_id=row['channelId'])
+        category, _ = Category.objects.get_or_create(id=row['categoryId'])
+        # You will need to fetch or create the region object based on your Region model
+        # region, _ = Region.objects.get_or_create(...) # Adapt this line to your Region model
+
+        # Create a new Video object
+        video, created = Video.objects.get_or_create(
+            video_id=row['video_id'],
+            defaults={
+                'title': row['title'],
+                'channel': channel,
+                'category': category,
+                # 'region': region, # Uncomment and adapt this line to your Region model
+                'comments_disabled': row['comments_disabled'] == 'TRUE',
+                'ratings_disabled': row['ratings_disabled'] == 'TRUE'
+            }
+        )
+
+        if created:
+            print(f"Created video: {row['title']}")
+        else:
+            print(f"Video already exists: {row['title']}")
+
+if __name__ == '__main__':
+    run()

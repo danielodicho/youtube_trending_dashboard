@@ -1,0 +1,79 @@
+[
+    {
+        "model": "youtube.region",
+        "pk": 1,
+        "fields": {
+            "region_name": "United States"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 2,
+        "fields": {
+            "region_name": "India"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 3,
+        "fields": {
+            "region_name": "Great Britain"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 4,
+        "fields": {
+            "region_name": "Germany"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 5,
+        "fields": {
+            "region_name": "Canada"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 6,
+        "fields": {
+            "region_name": "France"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 7,
+        "fields": {
+            "region_name": "Russia"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 8,
+        "fields": {
+            "region_name": "Brazil"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 9,
+        "fields": {
+            "region_name": "Mexico"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 10,
+        "fields": {
+            "region_name": "South Korea"
+        }
+    },
+    {
+        "model": "youtube.region",
+        "pk": 11,
+        "fields": {
+            "region_name": "Japan"
+        }
+    }
+]

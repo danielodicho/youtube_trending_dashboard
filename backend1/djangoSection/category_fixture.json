@@ -1,0 +1,184 @@
+[
+    {
+        "model": "youtube.category",
+        "pk": 1,
+        "fields": {
+            "category_name": "Film & Animation"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 2,
+        "fields": {
+            "category_name": "Autos & Vehicles"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 10,
+        "fields": {
+            "category_name": "Music"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 15,
+        "fields": {
+            "category_name": "Pets & Animals"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 17,
+        "fields": {
+            "category_name": "Sports"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 18,
+        "fields": {
+            "category_name": "Short Movies"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 19,
+        "fields": {
+            "category_name": "Travel & Events"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 20,
+        "fields": {
+            "category_name": "Gaming"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 21,
+        "fields": {
+            "category_name": "Videoblogging"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 22,
+        "fields": {
+            "category_name": "People & Blogs"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 23,
+        "fields": {
+            "category_name": "Comedy"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 24,
+        "fields": {
+            "category_name": "Entertainment"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 25,
+        "fields": {
+            "category_name": "News & Politics"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 26,
+        "fields": {
+            "category_name": "Howto & Style"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 27,
+        "fields": {
+            "category_name": "Education"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 28,
+        "fields": {
+            "category_name": "Science & Technology"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 29,
+        "fields": {
+            "category_name": "Nonprofits & Activism"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 30,
+        "fields": {
+            "category_name": "Movies"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 31,
+        "fields": {
+            "category_name": "Anime/Animation"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 32,
+        "fields": {
+            "category_name": "Action/Adventure"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 33,
+        "fields": {
+            "category_name": "Classics"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 34,
+        "fields": {
+            "category_name": "Comedy"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 35,
+        "fields": {
+            "category_name": "Documentary"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 36,
+        "fields": {
+            "category_name": "Drama"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 37,
+        "fields": {
+            "category_name": "Family"
+        }
+    },
+    {
+        "model": "youtube.category",
+        "pk": 38,
+        "fields": {
+            "category_name": "Foreign"
+        }
+    }
+]

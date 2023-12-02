@@ -1,0 +1,15 @@
+[
+    {
+        "model": "youtube.statistics",
+        "pk": "1234567",
+        "fields": {
+            "publishedAt": "2020-08-11T19:20:14Z",
+            "trending_date": "2020-08-12T00:00:00Z",
+            "view_count": 1514614,
+            "likes": 156908,
+            "dislikes": 5855,
+            "comment_count": 35313,
+            "video": "3C66w5Z0ixs"
+        }
+    }
+]
