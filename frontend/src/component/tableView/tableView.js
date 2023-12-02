@@ -7,39 +7,63 @@ import './tableView.scss';
 
 class tableView extends Component {
   render() {
-    const { youtubeData } = this.props;
+    const hardcodedData = [
+      {
+        video_id: '1',
+        video_title: 'Video 1',
+        views: 1000,
+        trending_date: '2023-01-01',
+        category_id: 'Music',
+        channel_title: 'Channel 1',
+        views_likes_ratio: '0.75',
+        click_rate: 10,
+        tags: 'music, entertainment',
+        thumbnail_url: 'https://example.com/thumbnail1.jpg',
+      },
+      {
+        video_id: '2',
+        video_title: 'Video 2',
+        views: 500,
+        trending_date: '2023-01-02',
+        category_id: 'Gaming',
+        channel_title: 'Channel 2',
+        views_likes_ratio: '0.65',
+        click_rate: 8,
+        tags: 'gaming, fun',
+        thumbnail_url: 'https://example.com/thumbnail2.jpg',
+      },
+      // Add more video entries as needed
+    ];
 
-    if (!youtubeData || youtubeData.length === 0) {
-      return (
-        <div className="noResults">
-          <h3>No data found.</h3>
-        </div>
-      );
-    } else {
-      return (
-        <List divided verticalAlign='middle'>
-          {youtubeData.map((video, index) => (
-            <List.Item key={index} className="listItem">
-              <Image src={video.thumbnail_url} avatar />
-              <List.Content>
-                <List.Header>
-                  <Link to={`/video/${video.video_id}`}>{video.video_title}</Link>
-                </List.Header>
-                <List.Description>
-                  <p>Views: {video.views}</p>
-                  <p>Trending Date: {video.trending_date}</p>
-                  <p>Category ID: {video.category_id}</p>
-                  <p>Channel Title: {video.channel_title}</p>
-                  {/* Change above once table frame is finished */}
-                </List.Description>
-              </List.Content>
-            </List.Item>
-          ))}
-        </List>
-      );
-    }
+    return (
+      <List divided verticalAlign='middle' className="tableViewContainer">
+        {hardcodedData.map((video, index) => (
+          <List.Item key={index} className="listItem">
+            <Image src={video.thumbnail_url} avatar />
+            <List.Content>
+              <List.Header>
+                <Link to={`/video/${video.video_id}`}>{video.video_title}</Link>
+              </List.Header>
+              <List.Description>
+                <div className="infoContainer">
+                  <div className="infoItem">{video.video_title}</div>
+                  <div className="infoItem">{video.views}</div>
+                  <div className="infoItem">{video.trending_date}</div>
+                  <div className="infoItem">{video.category_id}</div>
+                  <div className="infoItem">{video.channel_title}</div>
+                  <div className="infoItem">{video.views_likes_ratio}</div>
+                  <div className="infoItem">{video.click_rate}</div>
+                  <div className="infoItem">{video.tags}</div>
+                </div>
+              </List.Description>
+            </List.Content>
+          </List.Item>
+        ))}
+      </List>
+    );
   }
 }
+
 
 tableView.propTypes = {
     youtubeData: PropTypes.arrayOf(
