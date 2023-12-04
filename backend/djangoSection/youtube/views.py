@@ -19,11 +19,6 @@ class RegionViewSet(viewsets.ModelViewSet):
 
         data = [{'region_id': item[0], 'region_name': item[1]} for item in result]
         return data
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
     
 
     def retrieve(self, request, pk=None):
@@ -76,10 +71,41 @@ class CategoryViewSet(viewsets.ModelViewSet):
         data = [{'category_id': item[0], 'category_name': item[1]} for item in result]
         return data
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
+    def retrieve(self, request, pk=None):
+        sql_query = "SELECT * FROM youtube_category WHERE category_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            result = cursor.fetchone()
+
+        if result is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = {'category_id': result[0], 'category_name': result[1]}
+        serializer = self.serializer_class(data)
         return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        category_name = request.data.get('category_name')
+
+        if not category_name:
+            return Response({'error': 'Category name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sql_query = "UPDATE youtube_category SET category_name = %s WHERE category_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [category_name, pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Category updated'})
+    
+    def destroy(self, request, pk=None):
+        sql_query = "DELETE FROM youtube_category WHERE category_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class StatisticsViewSet(viewsets.ModelViewSet):
@@ -115,6 +141,49 @@ class StatisticsViewSet(viewsets.ModelViewSet):
             data.append(statistics_data)
 
         return data
+
+    def retrieve(self, request, pk=None):
+        sql_query = "SELECT * FROM youtube_statistics WHERE statistic_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            result = cursor.fetchone()
+
+        if result is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = {'statistic_id': result[0], 
+                'publishedAt': result[1],
+                'trending_date': result[2],
+                'view_count': result[3],
+                'comment_count': result[4],
+                'likes': result[5],
+                'dislikes': result[6],
+                'video': result[7]}
+        serializer = self.serializer_class(data)
+        return Response(serializer.data)
+
+    # def update(self, request, pk=None):
+    #     video = request.data.get('video')
+
+    #     if not video:
+    #         return Response({'error': 'Video name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     sql_query = "UPDATE youtube_statistics SET video = %s WHERE statistic_id = %s;"
+    #     with connections['default'].cursor() as cursor:
+    #         cursor.execute(sql_query, [video, pk])
+    #         if cursor.rowcount == 0:
+    #             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    #     return Response({'status': 'Statistics updated'})
+    
+    # def destroy(self, request, pk=None):
+    #     sql_query = "DELETE FROM youtube_statistics WHERE statistic_id = %s;"
+    #     with connections['default'].cursor() as cursor:
+    #         cursor.execute(sql_query, [pk])
+    #         if cursor.rowcount == 0:
+    #             return Response(status=status.HTTP_404_NOT_FOUND)
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    
     
     
 
@@ -128,7 +197,7 @@ class VideoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         sql_query = """
             SELECT video_id, title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id
-            FROM youtube_video;
+            FROM youtube_video
         """
         with connections['default'].cursor() as cursor:
             cursor.execute(sql_query)
@@ -158,6 +227,49 @@ class VideoViewSet(viewsets.ModelViewSet):
 
         return data
 
+    def retrieve(self, request, pk=None):
+        sql_query = "SELECT * FROM youtube_video WHERE video_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            result = cursor.fetchone()
+
+        if result is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = {'video_id': result[0], 
+                'title': result[1],
+                'thumbnail_link': result[2],
+                'comments_disabled': result[3],
+                'ratings_disabled': result[4],
+                'channel': result[5],
+                'region': result[6],
+                'category': result[7]}
+        serializer = self.serializer_class(data)
+        return Response(serializer.data)
+
+    # def update(self, request, pk=None):
+    #     title = request.data.get('title')
+
+    #     if not title:
+    #         return Response({'error': 'Title is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     sql_query = "UPDATE youtube_video SET title = %s WHERE video_id = %s;"
+    #     with connections['default'].cursor() as cursor:
+    #         cursor.execute(sql_query, [title, pk])
+    #         if cursor.rowcount == 0:
+    #             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    #     return Response({'status': 'Title updated'})
+    
+    # def destroy(self, request, pk=None):
+    #     sql_query = "DELETE FROM youtube_video WHERE video_id = %s;"
+    #     with connections['default'].cursor() as cursor:
+    #         cursor.execute(sql_query, [pk])
+    #         if cursor.rowcount == 0:
+    #             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 class YouTuberViewSet(viewsets.ModelViewSet):
@@ -176,11 +288,6 @@ class YouTuberViewSet(viewsets.ModelViewSet):
 
         return data
 
-    def list(self, request, *args, **kwargs):
-        # Override list method to handle the raw queryset
-        queryset = self.get_queryset()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
 
 
 
