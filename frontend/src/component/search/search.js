@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Button, Input, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
 import Import from '../import/import';
+import Update from '../update/update';
+
 import Table from '../table/table'; 
 
 import './search.scss';
@@ -163,7 +165,11 @@ class Search extends Component {
           </span>
         </div>
 
-        <Import />
+        <div className="import-update-container">
+          <Import />
+          <Update />
+        </div>
+
 
         <Table youtubeData={this.state.videoList} />
       </div>
