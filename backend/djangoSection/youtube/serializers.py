@@ -41,8 +41,7 @@ class StatisticsSerializer(serializers.ModelSerializer):
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
-        fields = "__all__"
-        # fields = ['video_id', 'title', 'thumbnail_link', 'comments_disabled', 'ratings_disabled', 'channel', 'region', 'category']
+        fields = ['video_id', 'title', 'thumbnail_link', 'comments_disabled', 'ratings_disabled', 'channel', 'region', 'category']
 
 class YouTuberSerializer(serializers.ModelSerializer):
     class Meta:

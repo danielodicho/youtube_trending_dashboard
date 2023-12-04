@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
+import { Button, Input, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
-import TableView from '../tableView/tableView';
 import Import from '../import/import';
+import Update from '../update/update';
+import Delete from '../delete/delete';
+
 import Table from '../table/table'; 
 
 import './search.scss';
@@ -11,23 +13,23 @@ const sortOptions = [
   { key: 'title', text: 'Title', value: 'title' },
   { key: 'views', text: 'Views', value: 'views' },
   { key: 'trendingDate', text: 'TrendingDate', value: 'trendingDate' },
-  { key: 'categoryId', text: 'CategoryId', value: 'categoryId' },
-  { key: 'channelTitle', text: 'ChannelTitle', value: 'channelTitle' },
+  { key: 'categoryId', text: 'CategoryName', value: 'categoryId' },
+  { key: 'channelTitle', text: 'ChannelName', value: 'channelTitle' },
 ];
 
 class Search extends Component {
+  
   constructor() {
     super();
 
     this.state = {
       value: '',
-      videoList: null,
+      videoList: [],
       sort: 'name',
       order: 'Ascending',
     };
 
-    // replace with google cloud api
-    // this.baseUrl = 'https://pokeapi.co/api/v2/pokedex/national';
+    this.baseUrl = 'http://localhost:8000/videos/';
     this.searchHandler = this.searchHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.sortHandler = this.sortHandler.bind(this);
@@ -35,39 +37,81 @@ class Search extends Component {
   }
 
   componentDidMount() {
-    // Automatically call the clickHandler when the component mounts
+    // Fetch videos when the component mounts
     this.clickHandler();
   }
 
   async clickHandler() {
-    // const response = await axios.get(this.baseUrl);
-    // const allPokemonEntries = response.data.pokemon_entries;
+    try {
+      // Fetch data from all endpoints
+      const [videosResponse, statsResponse, youtubersResponse, categoriesResponse] = await Promise.all([
+        axios.get('http://localhost:8000/videos/'),
+        axios.get('http://localhost:8000/statistics/'),
+        axios.get('http://localhost:8000/youtubers/'),
+        axios.get('http://localhost:8000/categories/')
+      ]);
+  
+      // Extract data from responses
+      const videosData = videosResponse.data;
+      const statsData = statsResponse.data;
+      const youtubersData = youtubersResponse.data;
+      const categoriesData = categoriesResponse.data;
+  
+      // Merge videos with statistics, youtubers, and categories
+      const mergedData = videosData.map(video => {
+        const stats = statsData.find(stat => stat.video === video.video_id);
+        const youtuber = youtubersData.find(youtuber => youtuber.channel_id === video.channel);
+        const category = categoriesData.find(cat => cat.category_id === video.category);
+        return { ...video, ...stats, ...youtuber, ...category};
+      });
+  
+      // Apply search filter and update state
+      const filteredList = mergedData.filter(video =>
+        video.title && video.title.toLowerCase().includes(this.state.value.toLowerCase())
+      );
 
-    const matchedEntries = []
-    // const matchedEntries = allPokemonEntries.filter(entry =>
-    //   entry.pokemon_species.name.toLowerCase().includes(this.state.value.toLowerCase())
-    // );
+      this.sortAndOrderVideos(filteredList);
+  
+      this.setState({ videoList: filteredList });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
 
-    const videoListSorted = matchedEntries.map(video => ({
-      videoTitle: video.videoTitle
-      // add more stuff here
-    }));
+  sortAndOrderVideos(videoList) {
+    // Sort logic based on the state
     if (this.state.sort === "title") {
-      // Do title sort
-      // matchedPokemonData.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name));
+      videoList.sort((a, b) => a.title.localeCompare(b.title));
     }
-    
+    if (this.state.sort === "views") {
+      videoList.sort((a, b) => a.view_count - b.view_count);
+    }
+    if (this.state.sort === "trendingDate") {
+      videoList.sort((a, b) => new Date(a.trending_date) - new Date(b.trending_date));
+    }
+    if (this.state.sort === "categoryId") {
+      // Check if the properties exist before using localeCompare
+      videoList.sort((a, b) => (a.category_name || '').localeCompare(b.category_name || ''));
+    }
+    if (this.state.sort === "channelTitle") {
+      // Check if the properties exist before using localeCompare
+      videoList.sort((a, b) => (a.channel_title || '').localeCompare(b.channel_title || ''));
+    }
+    // Add other sort options as needed
+  
     if (this.state.order === "Descending") {
-      videoListSorted.reverse();
+      videoList.reverse();
     }
-
+  
     this.setState({
-      videoList: videoListSorted,
+      videoList: videoList,
     });
   }
 
   searchHandler(event) {
-    this.setState({ value: event.target.value });
+    this.setState({ value: event.target.value }, () => {
+      this.clickHandler();
+    });
   }
 
   sortHandler(_, data) {
@@ -84,8 +128,8 @@ class Search extends Component {
   }
 
   handleImport = (importedData) => {
-    // Handle the imported JSON data (e.g., update state with new data)
     console.log('Imported JSON data:', importedData);
+    // Handle the imported data
   };
 
   render() {
@@ -100,6 +144,7 @@ class Search extends Component {
               className="searchbar-input"
             />
             <Button className='search-button' onClick={this.clickHandler}>Search</Button>
+            <Delete onClick={this.handleDelete} />
           </div>
         </div>
         <div className='sort-dropdown'>
@@ -138,7 +183,11 @@ class Search extends Component {
           </span>
         </div>
 
-        <Import />
+        <div className="import-update-container">
+          <Import />
+          <Update />
+        </div>
+
 
         <Table youtubeData={this.state.videoList} />
       </div>
