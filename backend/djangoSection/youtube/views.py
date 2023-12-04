@@ -5,6 +5,7 @@ from rest_framework import generics
 from .models import Region, Category, Statistics, Video, YouTuber
 from .serializers import RegionSerializer, CategorySerializer, StatisticsSerializer, VideoSerializer, YouTuberSerializer
 from rest_framework import viewsets
+from rest_framework import status
 
 
 class RegionViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,44 @@ class RegionViewSet(viewsets.ModelViewSet):
         queryset = self.get_queryset()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+    
+
+    def retrieve(self, request, pk=None):
+        sql_query = "SELECT * FROM youtube_region WHERE region_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            result = cursor.fetchone()
+
+        if result is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = {'region_id': result[0], 'region_name': result[1]}
+        serializer = self.serializer_class(data)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        region_name = request.data.get('region_name')
+
+        if not region_name:
+            return Response({'error': 'Region name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sql_query = "UPDATE youtube_region SET region_name = %s WHERE region_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [region_name, pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Region updated'})
+    
+    def destroy(self, request, pk=None):
+        sql_query = "DELETE FROM youtube_region WHERE region_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -42,32 +81,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 
-
-# class StatisticsViewSet(viewsets.ModelViewSet):
-#     queryset = Statistics.objects.all()
-#     serializer_class = StatisticsSerializer
-
-# class VideoViewSet(viewsets.ModelViewSet):
-#     queryset = Video.objects.all()
-#     serializer_class = VideoSerializer
-
-# class StatisticsViewSet(viewsets.ModelViewSet):
-#     serializer_class = StatisticsSerializer
-
-#     def get_queryset(self):
-#         sql_query = "SELECT * FROM youtube_statistics;"
-#         with connections['default'].cursor() as cursor:
-#             cursor.execute(sql_query)
-#             result = cursor.fetchall()
-
-#         data = [{'statistic_id': item[0], 'publishedAt': item[1], 'trending_date': item[2], 'view_count': item[3], 'comment_count': item[4],
-#                  'likes': item[5], 'dislikes': item[6], 'video': item[7]} for item in result]
-#         return data
-
-#     def list(self, request, *args, **kwargs):
-#         queryset = self.get_queryset()
-#         serializer = self.serializer_class(queryset, many=True)
-#         return Response(serializer.data)
 
 class StatisticsViewSet(viewsets.ModelViewSet):
     serializer_class = StatisticsSerializer
@@ -102,6 +115,11 @@ class StatisticsViewSet(viewsets.ModelViewSet):
             data.append(statistics_data)
 
         return data
+    
+    
+
+    
+
 
 
 class VideoViewSet(viewsets.ModelViewSet):
