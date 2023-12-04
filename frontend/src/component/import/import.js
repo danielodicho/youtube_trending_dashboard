@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import './import.scss';
 
 class Import extends React.Component {
@@ -32,7 +33,12 @@ class Import extends React.Component {
       const content = e.target.result;
       try {
         const videosData = JSON.parse(content);
-        this.processVideosData(videosData);
+
+        if (this.isVideoDataValid(videosData)) {
+          this.processVideosData(videosData);
+        } else {
+          console.error("Invalid video data format");
+        }
       } catch (error) {
         console.error("Error parsing JSON file:", error);
       }
@@ -41,18 +47,20 @@ class Import extends React.Component {
     reader.readAsText(file);
   }
 
-  processVideosData(videosData) {
-    // Here you can access the fields like video_title, views, trending_data, etc.
-    console.log("Video Title:", videosData.video_title);
-    console.log("Views:", videosData.views);
-    console.log("Trending Data:", videosData.trending_data);
-    console.log("Category ID:", videosData.category_id);
-    console.log("Channel Title:", videosData.channel_title);
-    console.log("Views Likes Ratio:", videosData.views_likes_ratio);
-    console.log("Click Rate:", videosData.click_rate);
-    console.log("Tags:", videosData.tags);
+  isVideoDataValid(videosData) {
+    // Check if the imported data matches the expected structure for a single video information
+    return videosData && typeof videosData === 'object' && !Array.isArray(videosData);
+  }
 
-    // Insert video to database here???
+  processVideosData(videosData) {
+    axios.post('http://localhost:8000/videos/', videosData)
+      .then(response => {
+        console.log("Videos added successfully:", response.data);
+        // Additional handling if needed
+      })
+      .catch(error => {
+        console.error("Error adding videos:", error);
+      });
   }
 
   render() {
