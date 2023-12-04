@@ -3,6 +3,7 @@ import { Button, Input, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
 import Import from '../import/import';
 import Update from '../update/update';
+import Delete from '../delete/delete';
 
 import Table from '../table/table'; 
 
@@ -127,6 +128,7 @@ class Search extends Component {
               className="searchbar-input"
             />
             <Button className='search-button' onClick={this.clickHandler}>Search</Button>
+            <Delete onClick={this.handleDelete} />
           </div>
         </div>
         <div className='sort-dropdown'>
