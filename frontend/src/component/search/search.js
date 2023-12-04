@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Input, Container, Image, Dropdown } from "semantic-ui-react";
+import { Button, Input, Dropdown } from "semantic-ui-react";
 import axios from 'axios';
-import TableView from '../tableView/tableView';
 import Import from '../import/import';
 import Table from '../table/table'; 
 
@@ -16,18 +15,18 @@ const sortOptions = [
 ];
 
 class Search extends Component {
+  
   constructor() {
     super();
 
     this.state = {
       value: '',
-      videoList: null,
+      videoList: [],
       sort: 'name',
       order: 'Ascending',
     };
 
-    // replace with google cloud api
-    // this.baseUrl = 'https://pokeapi.co/api/v2/pokedex/national';
+    this.baseUrl = 'http://localhost:8000/videos/';
     this.searchHandler = this.searchHandler.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.sortHandler = this.sortHandler.bind(this);
@@ -35,39 +34,47 @@ class Search extends Component {
   }
 
   componentDidMount() {
-    // Automatically call the clickHandler when the component mounts
+    // Fetch videos when the component mounts
     this.clickHandler();
   }
 
   async clickHandler() {
-    // const response = await axios.get(this.baseUrl);
-    // const allPokemonEntries = response.data.pokemon_entries;
+    try {
+      const response = await axios.get(this.baseUrl);
+      const videoList = response.data;
 
-    const matchedEntries = []
-    // const matchedEntries = allPokemonEntries.filter(entry =>
-    //   entry.pokemon_species.name.toLowerCase().includes(this.state.value.toLowerCase())
-    // );
+      // Apply search filter if any
+      const filteredList = videoList.filter(video =>
+        video.title.toLowerCase().includes(this.state.value.toLowerCase())
+      );
 
-    const videoListSorted = matchedEntries.map(video => ({
-      videoTitle: video.videoTitle
-      // add more stuff here
-    }));
-    if (this.state.sort === "title") {
-      // Do title sort
-      // matchedPokemonData.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name));
+      // Sort and order the list
+      this.sortAndOrderVideos(filteredList);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
     }
-    
+  }
+
+  sortAndOrderVideos(videoList) {
+    // Sort logic based on the state
+    if (this.state.sort === "title") {
+      videoList.sort((a, b) => a.title.localeCompare(b.video_title));
+    }
+    // Add other sort options as needed
+
     if (this.state.order === "Descending") {
-      videoListSorted.reverse();
+      videoList.reverse();
     }
 
     this.setState({
-      videoList: videoListSorted,
+      videoList: videoList,
     });
   }
 
   searchHandler(event) {
-    this.setState({ value: event.target.value });
+    this.setState({ value: event.target.value }, () => {
+      this.clickHandler();
+    });
   }
 
   sortHandler(_, data) {
@@ -84,8 +91,8 @@ class Search extends Component {
   }
 
   handleImport = (importedData) => {
-    // Handle the imported JSON data (e.g., update state with new data)
     console.log('Imported JSON data:', importedData);
+    // Handle the imported data
   };
 
   render() {
