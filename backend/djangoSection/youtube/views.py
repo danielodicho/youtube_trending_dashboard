@@ -270,7 +270,10 @@ class VideoViewSet(viewsets.ModelViewSet):
         # if not all([video_id, title, channel_id, region_id, category_id]):
         #     return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-
+        if not all([YouTuber.objects.filter(pk=channel_id).exists(), 
+                Region.objects.filter(pk=region_id).exists(),
+                Category.objects.filter(pk=category_id).exists()]):
+            return Response({'error': 'Invalid channel_id, region_id, or category_id'}, status=status.HTTP_400_BAD_REQUEST)
         # SQL Query to insert a new video record
         sql_query = """
             INSERT INTO youtube_video (video_id, title, thumbnail_link, comments_disabled, 
@@ -289,7 +292,8 @@ class VideoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         sql_query = """
-            SELECT video_id, title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id
+            SELECT video_id, title, thumbnail_link, comments_disabled, ratings_disabled, 
+                channel_id, region_id, category_id
             FROM youtube_video
         """
         with connections['default'].cursor() as cursor:
@@ -300,10 +304,10 @@ class VideoViewSet(viewsets.ModelViewSet):
         for item in result:
             video_id, title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id = item
 
-            # Fetch related models
-            # channel = YouTuber.objects.get(pk=channel_id)
-            # region = Region.objects.get(pk=region_id)
-            # category = Category.objects.get(pk=category_id)
+            # Fetch the actual model instances
+            channel = YouTuber.objects.get(pk=channel_id) if channel_id else None
+            region = Region.objects.get(pk=region_id) if region_id else None
+            category = Category.objects.get(pk=category_id) if category_id else None
 
             video_data = {
                 'video_id': video_id,
@@ -311,14 +315,15 @@ class VideoViewSet(viewsets.ModelViewSet):
                 'thumbnail_link': thumbnail_link,
                 'comments_disabled': bool(comments_disabled),
                 'ratings_disabled': bool(ratings_disabled),
-                'channel_id': channel_id,
-                'region_id': region_id,
-                'category_id': category_id,
+                'channel': channel,  # Model instance
+                'region': region,    # Model instance
+                'category': category, # Model instance
             }
 
             data.append(video_data)
 
         return data
+
 
     def retrieve(self, request, pk=None):
         sql_query = """
