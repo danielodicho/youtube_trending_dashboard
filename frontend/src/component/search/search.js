@@ -12,8 +12,8 @@ const sortOptions = [
   { key: 'title', text: 'Title', value: 'title' },
   { key: 'views', text: 'Views', value: 'views' },
   { key: 'trendingDate', text: 'TrendingDate', value: 'trendingDate' },
-  { key: 'categoryId', text: 'CategoryId', value: 'categoryId' },
-  { key: 'channelTitle', text: 'ChannelTitle', value: 'channelTitle' },
+  { key: 'categoryId', text: 'CategoryName', value: 'categoryId' },
+  { key: 'channelTitle', text: 'ChannelName', value: 'channelTitle' },
 ];
 
 class Search extends Component {
@@ -68,6 +68,8 @@ class Search extends Component {
       const filteredList = mergedData.filter(video =>
         video.title && video.title.toLowerCase().includes(this.state.value.toLowerCase())
       );
+
+      this.sortAndOrderVideos(filteredList);
   
       this.setState({ videoList: filteredList });
     } catch (error) {
@@ -78,7 +80,19 @@ class Search extends Component {
   sortAndOrderVideos(videoList) {
     // Sort logic based on the state
     if (this.state.sort === "title") {
-      videoList.sort((a, b) => a.title.localeCompare(b.video_title));
+      videoList.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    if (this.state.sort === "views") {
+      videoList.sort((a, b) => a.view_count.localeCompare(b.view_count));
+    }
+    if (this.state.sort === "trendingDate") {
+      videoList.sort((a, b) => a.trending_date.localeCompare(b.trending_date));
+    }
+    if (this.state.sort === "categoryId") {
+      videoList.sort((a, b) => a.category_name.localeCompare(b.category_name));
+    }
+    if (this.state.sort === "channelTitle") {
+      videoList.sort((a, b) => a.channel_title.localeCompare(b.channel_title));
     }
     // Add other sort options as needed
 

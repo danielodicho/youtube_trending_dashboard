@@ -29,13 +29,13 @@ class Table extends Component {
             ))}
           </div>
           <div className="columnHeader">
-            <span>Category ID</span>
+            <span>Category Name</span>
             {youtubeData.map((data, index) => (
               <div key={index}>{data.category_name}</div>
             ))}
           </div>
           <div className="columnHeader">
-            <span>Channel Title</span>
+            <span>Channel Name</span>
             {youtubeData.map((data, index) => (
               <div key={index}>{data.channel_title}</div>
             ))}

@@ -2,30 +2,32 @@
   overflow-x: auto;
 }
 
-.tableHeader {
-  display: grid; /* Use display: grid to create a grid layout */
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust column widths as needed */
+.tableHeader,
+.tableRow { /* Apply the same grid layout to each row of data */
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* Assuming you have 7 columns, adjust the number as needed */
   position: sticky;
   top: 0;
   background-color: #f2f2f2;
   z-index: 1;
 }
 
-.columnHeader {
+.columnHeader,
+.cell { /* Apply similar styling to each cell of data */
   padding: 8px;
   text-align: left;
   border-right: 1px solid #ddd;
-  overflow: hidden; /* Ensure text doesn't overflow */
-  text-overflow: ellipsis; /* Add ellipsis for overflow text */
-  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.columnHeader:last-child {
+.columnHeader:last-child,
+.cell:last-child { /* No border for the last cell */
   border-right: none;
 }
 
-.columnHeader span {
+.columnHeader span,
+.cell span { /* If you have spans inside cells for additional styling */
   font-weight: bold;
 }
-
-/* Add additional styling as needed */
