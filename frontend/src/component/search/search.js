@@ -84,23 +84,25 @@ class Search extends Component {
       videoList.sort((a, b) => a.title.localeCompare(b.title));
     }
     if (this.state.sort === "views") {
-      videoList.sort((a, b) => a.view_count.localeCompare(b.view_count));
+      videoList.sort((a, b) => a.view_count - b.view_count);
     }
     if (this.state.sort === "trendingDate") {
-      videoList.sort((a, b) => a.trending_date.localeCompare(b.trending_date));
+      videoList.sort((a, b) => new Date(a.trending_date) - new Date(b.trending_date));
     }
     if (this.state.sort === "categoryId") {
-      videoList.sort((a, b) => a.category_name.localeCompare(b.category_name));
+      // Check if the properties exist before using localeCompare
+      videoList.sort((a, b) => (a.category_name || '').localeCompare(b.category_name || ''));
     }
     if (this.state.sort === "channelTitle") {
-      videoList.sort((a, b) => a.channel_title.localeCompare(b.channel_title));
+      // Check if the properties exist before using localeCompare
+      videoList.sort((a, b) => (a.channel_title || '').localeCompare(b.channel_title || ''));
     }
     // Add other sort options as needed
-
+  
     if (this.state.order === "Descending") {
       videoList.reverse();
     }
-
+  
     this.setState({
       videoList: videoList,
     });
