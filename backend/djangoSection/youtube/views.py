@@ -510,24 +510,38 @@ class YouTuberViewSet(viewsets.ModelViewSet):
     
 
 
+
+
     def destroy(self, request, pk=None):
         # Start a transaction to ensure data integrity
         with transaction.atomic():
+            # SQL Query to delete all statistics related to the YouTuber's videos
+            delete_statistics_query = """
+                DELETE FROM youtube_statistics
+                WHERE video_id IN (
+                    SELECT video_id FROM youtube_video WHERE channel_id = %s
+                );
+            """
+
             # SQL Query to delete all videos related to the YouTuber
             delete_videos_query = "DELETE FROM youtube_video WHERE channel_id = %s;"
+
             # SQL Query to delete the YouTuber record
             delete_youtuber_query = "DELETE FROM youtube_youtuber WHERE channel_id = %s;"
 
             with connections['default'].cursor() as cursor:
-                # Delete all related videos first
+                # Delete all related statistics first
+                cursor.execute(delete_statistics_query, [pk])
+
+                # Delete all related videos next
                 cursor.execute(delete_videos_query, [pk])
 
-                # Next, delete the YouTuber record
+                # Finally, delete the YouTuber record
                 cursor.execute(delete_youtuber_query, [pk])
                 if cursor.rowcount == 0:
                     return Response({'error': 'YouTuber not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'status': 'YouTuber and related videos deleted'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'status': 'YouTuber, related videos, and statistics deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
 
