@@ -11,11 +11,16 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['category_id', 'category_name']
 
+
+
+
+
+
 class StatisticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statistics
-        fields = ['statistic_id', 'publishedAt', 'trending_date', 'view_count', 'comment_count', 'likes', 'dislikes', 'video']
-
+        # fields = ['statistic_id', 'publishedAt', 'trending_date', 'view_count', 'comment_count', 'likes', 'dislikes', 'video']
+        fields = "__all__"
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video

@@ -19,7 +19,7 @@ class Statistics(models.Model):
     comment_count = models.IntegerField(blank=True, null=True)
     likes = models.IntegerField(blank=True, null=True)
     dislikes = models.IntegerField(blank=True, null=True)
-    video = models.ForeignKey('Video', on_delete=models.CASCADE, db_column='video_id', blank=True, null=True)
+    video = models.ForeignKey('Video', on_delete=models.CASCADE, blank=True, null=True)
 
 
 
@@ -29,7 +29,6 @@ class Video(models.Model):
     thumbnail_link = models.CharField(max_length=255, blank=True, null=True)
     comments_disabled = models.BooleanField(blank=True, null=True)
     ratings_disabled = models.BooleanField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
     channel = models.ForeignKey('YouTuber', on_delete=models.CASCADE, blank=True, null=True)
     region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True)
