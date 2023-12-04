@@ -40,18 +40,36 @@ class Search extends Component {
 
   async clickHandler() {
     try {
-      const response = await axios.get(this.baseUrl);
-      const videoList = response.data;
-
-      // Apply search filter if any
-      const filteredList = videoList.filter(video =>
-        video.title.toLowerCase().includes(this.state.value.toLowerCase())
+      // Fetch data from all endpoints
+      const [videosResponse, statsResponse, youtubersResponse, categoriesResponse] = await Promise.all([
+        axios.get('http://localhost:8000/videos/'),
+        axios.get('http://localhost:8000/statistics/'),
+        axios.get('http://localhost:8000/youtubers/'),
+        axios.get('http://localhost:8000/categories/')
+      ]);
+  
+      // Extract data from responses
+      const videosData = videosResponse.data;
+      const statsData = statsResponse.data;
+      const youtubersData = youtubersResponse.data;
+      const categoriesData = categoriesResponse.data;
+  
+      // Merge videos with statistics, youtubers, and categories
+      const mergedData = videosData.map(video => {
+        const stats = statsData.find(stat => stat.video === video.video_id);
+        const youtuber = youtubersData.find(youtuber => youtuber.channel_id === video.channel);
+        const category = categoriesData.find(cat => cat.category_id === video.category);
+        return { ...video, ...stats, ...youtuber, ...category};
+      });
+  
+      // Apply search filter and update state
+      const filteredList = mergedData.filter(video =>
+        video.title && video.title.toLowerCase().includes(this.state.value.toLowerCase())
       );
-
-      // Sort and order the list
-      this.sortAndOrderVideos(filteredList);
+  
+      this.setState({ videoList: filteredList });
     } catch (error) {
-      console.error('Error fetching videos:', error);
+      console.error('Error fetching data:', error);
     }
   }
 

@@ -19,7 +19,7 @@ class Table extends Component {
           <div className="columnHeader">
             <span>Views</span>
             {youtubeData.map((data, index) => (
-              <div key={index}>{data.views}</div>
+              <div key={index}>{data.view_count}</div>
             ))}
           </div>
           <div className="columnHeader">
@@ -31,7 +31,7 @@ class Table extends Component {
           <div className="columnHeader">
             <span>Category ID</span>
             {youtubeData.map((data, index) => (
-              <div key={index}>{data.category_id}</div>
+              <div key={index}>{data.category_name}</div>
             ))}
           </div>
           <div className="columnHeader">
@@ -43,19 +43,13 @@ class Table extends Component {
           <div className="columnHeader">
             <span>Views/Likes Ratio</span>
             {youtubeData.map((data, index) => (
-              <div key={index}>{data.views_likes_ratio}</div>
+              <div key={index}>{data.view_count / data.likes}</div>
             ))}
           </div>
           <div className="columnHeader">
-            <span>Click Rate</span>
+            <span>Comments</span>
             {youtubeData.map((data, index) => (
-              <div key={index}>{data.click_rate}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Tags</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.tags}</div>
+              <div key={index}>{data.comment_count}</div>
             ))}
           </div>
         </div>
