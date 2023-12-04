@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from django.db import connections
 from rest_framework import viewsets, status
 from .models import YouTuber
-
+from django.db import transaction
 
 class RegionViewSet(viewsets.ModelViewSet):
     serializer_class = RegionSerializer
@@ -434,13 +434,17 @@ class VideoViewSet(viewsets.ModelViewSet):
     
     def destroy(self, request, pk=None):
         # SQL Query to delete the video record
-        sql_query = "DELETE FROM youtube_video WHERE video_id = %s;"
+        delete_statistics_query = "DELETE FROM youtube_statistics WHERE video_id = %s;"
+        delete_video_query = "DELETE FROM youtube_video WHERE video_id = %s;"
+        
         with connections['default'].cursor() as cursor:
-            cursor.execute(sql_query, [pk])
+            cursor.execute(delete_statistics_query, [pk])
+            cursor.execute(delete_video_query, [pk])
+
             if cursor.rowcount == 0:
                 return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'status': 'Video deleted'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'status': 'Video and related stats deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
 
@@ -504,14 +508,27 @@ class YouTuberViewSet(viewsets.ModelViewSet):
 
         return Response({'status': 'Channel updated'})
     
-    def destroy(self, request, pk=None):
-        sql_query = "DELETE FROM youtube_youtuber WHERE channel_id = %s;"
-        with connections['default'].cursor() as cursor:
-            cursor.execute(sql_query, [pk])
-            if cursor.rowcount == 0:
-                return Response(status=status.HTTP_404_NOT_FOUND)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def destroy(self, request, pk=None):
+        # Start a transaction to ensure data integrity
+        with transaction.atomic():
+            # SQL Query to delete all videos related to the YouTuber
+            delete_videos_query = "DELETE FROM youtube_video WHERE channel_id = %s;"
+            # SQL Query to delete the YouTuber record
+            delete_youtuber_query = "DELETE FROM youtube_youtuber WHERE channel_id = %s;"
+
+            with connections['default'].cursor() as cursor:
+                # Delete all related videos first
+                cursor.execute(delete_videos_query, [pk])
+
+                # Next, delete the YouTuber record
+                cursor.execute(delete_youtuber_query, [pk])
+                if cursor.rowcount == 0:
+                    return Response({'error': 'YouTuber not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'YouTuber and related videos deleted'}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 
