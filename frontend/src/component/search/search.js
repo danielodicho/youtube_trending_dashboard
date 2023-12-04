@@ -137,8 +137,8 @@ class Search extends Component {
   
     const deletePromises = videoList.map(video => {
       // Check if the video has a valid id
-      if (video.id) {
-        return axios.delete(`http://localhost:8000/videos/${video.id}/`);
+      if (video.video_id) {
+        return axios.delete(`http://localhost:8000/videos/${video.video_id}/`);
       } else {
         // If no valid id, log an error or handle as appropriate
         console.error('Invalid video ID:', video);
