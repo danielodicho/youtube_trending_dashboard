@@ -6,6 +6,14 @@ from .models import Region, Category, Statistics, Video, YouTuber
 from .serializers import RegionSerializer, CategorySerializer, StatisticsSerializer, VideoSerializer, YouTuberSerializer, StatisticsRawSerializer, VideoRawSerializer
 from rest_framework import viewsets
 from rest_framework import status
+from .models import Region, Category, Statistics, Video, YouTuber
+from .serializers import RegionSerializer, CategorySerializer, StatisticsSerializer, VideoSerializer, YouTuberSerializer
+from django.db.models import Max
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.db import connections
+from rest_framework import viewsets, status
+from .models import YouTuber
 
 
 class RegionViewSet(viewsets.ModelViewSet):
@@ -256,6 +264,33 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
 
+    # lowkey not properly tested, yet..
+    @action(detail=False, methods=['get'])
+    def get_popular_videos(self, request):
+        min_likes = request.query_params.get('min_likes', 100000)  # Default to 100000 if not provided
+        limit_rows = request.query_params.get('limit_rows', 10)  # Default to 10 if not provided
+        min_likes = int(min_likes)
+        limit_rows = int(limit_rows)
+
+        sql_query = """
+                    SELECT v.video_id, v.title, MAX(s.likes) AS likes
+                    FROM youtube_Video v
+                    JOIN youtube_Statistics s ON v.video_id = s.video_id
+                    GROUP BY v.video_id
+                    HAVING MAX(s.likes) >= %s
+                    ORDER BY MAX(s.likes) DESC
+                    LIMIT %s;
+                """
+
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [min_likes, limit_rows])
+            columns = [col[0] for col in cursor.description]
+            result = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        return Response(result)
+
+
+
     def create(self, request):
         # Extract the fields from the request
         video_id = request.data.get('video_id')
@@ -270,10 +305,19 @@ class VideoViewSet(viewsets.ModelViewSet):
         # if not all([video_id, title, channel_id, region_id, category_id]):
         #     return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not all([YouTuber.objects.filter(pk=channel_id).exists(), 
-                Region.objects.filter(pk=region_id).exists(),
-                Category.objects.filter(pk=category_id).exists()]):
-            return Response({'error': 'Invalid channel_id, region_id, or category_id'}, status=status.HTTP_400_BAD_REQUEST)
+        print(channel_id, region_id, category_id)
+        print(YouTuber.objects.filter(pk=channel_id).exists())
+        print(Region.objects.filter(pk=region_id).exists())
+        print(Category.objects.filter(pk=category_id).exists())
+        if channel_id and not YouTuber.objects.filter(pk=channel_id).exists():
+            return Response({'error': 'Invalid channel_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if region_id and not Region.objects.filter(pk=region_id).exists():
+            return Response({'error': 'Invalid region_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if category_id and not Category.objects.filter(pk=category_id).exists():
+            return Response({'error': 'Invalid category_id'}, status=status.HTTP_400_BAD_REQUEST)
+
         # SQL Query to insert a new video record
         sql_query = """
             INSERT INTO youtube_video (video_id, title, thumbnail_link, comments_disabled, 
@@ -403,6 +447,22 @@ class VideoViewSet(viewsets.ModelViewSet):
 
 class YouTuberViewSet(viewsets.ModelViewSet):
     serializer_class = YouTuberSerializer
+
+    # only tested locally, shits working tho
+    @action(detail=False, methods=['get'])
+    def search_youtuber(self, request):
+        search_string = request.query_params.get('search_string', '')
+
+        if not search_string:
+            return Response({'error': 'Search string is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sql_query = "SELECT * FROM youtube_YouTuber WHERE channel_title LIKE %s"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [search_string + '%'])
+            columns = [col[0] for col in cursor.description]
+            result = [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+        return Response(result)
 
     def get_queryset(self):
         # Use raw SQL query to fetch data
