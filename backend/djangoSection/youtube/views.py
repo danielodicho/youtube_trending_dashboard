@@ -43,9 +43,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class StatisticsViewSet(viewsets.ModelViewSet):
-    queryset = Statistics.objects.all()
-    serializer_class = StatisticsSerializer
+# class StatisticsViewSet(viewsets.ModelViewSet):
+#     queryset = Statistics.objects.all()
+#     serializer_class = StatisticsSerializer
 
 # class VideoViewSet(viewsets.ModelViewSet):
 #     queryset = Video.objects.all()
@@ -74,7 +74,7 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         sql_query = """
-            SELECT statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video
+            SELECT statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video_id
             FROM youtube_statistics;
         """
         with connections['default'].cursor() as cursor:
@@ -83,12 +83,10 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
         data = []
         for item in result:
-            statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video = item
+            statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video_id = item
 
             # Fetch related models
-            # channel = YouTuber.objects.get(pk=channel_id)
-            # region = Region.objects.get(pk=region_id)
-            # category = Category.objects.get(pk=category_id)
+            video = Video.objects.get(pk=video_id)
 
             statistics_data = {
                 'statistic_id': statistic_id,
