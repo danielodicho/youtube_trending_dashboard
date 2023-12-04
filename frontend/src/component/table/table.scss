@@ -1,38 +1,31 @@
 .tableContainer {
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  margin: 50px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
 }
 
 .tableHeader {
-  display: flex;
-  align-items: center;
-
-  .columnHeader {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-right: 20px;
-    border-right: 1px solid #ddd;
-    padding-bottom: 10px; /* Add padding to create space for the line */
-
-    span {
-      font-weight: bold;
-      margin-bottom: 5px;
-      padding-right: 10px;
-    }
-
-    &:last-child {
-      border-right: none;
-    }
-  }
+  display: grid; /* Use display: grid to create a grid layout */
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust column widths as needed */
+  position: sticky;
+  top: 0;
+  background-color: #f2f2f2;
+  z-index: 1;
 }
 
-/* Add the following rule to create space between Import and Table */
-.import-container {
-  margin-bottom: 20px;
+.columnHeader {
+  padding: 8px;
+  text-align: left;
+  border-right: 1px solid #ddd;
+  overflow: hidden; /* Ensure text doesn't overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflow text */
+  white-space: nowrap; /* Prevent text from wrapping */
 }
+
+.columnHeader:last-child {
+  border-right: none;
+}
+
+.columnHeader span {
+  font-weight: bold;
+}
+
+/* Add additional styling as needed */
