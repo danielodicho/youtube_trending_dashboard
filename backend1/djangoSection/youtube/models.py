@@ -19,7 +19,7 @@ class Statistics(models.Model):
     comment_count = models.IntegerField(blank=True, null=True)
     likes = models.IntegerField(blank=True, null=True)
     dislikes = models.IntegerField(blank=True, null=True)
-    video = models.ForeignKey('Video', on_delete=models.CASCADE, db_column='video_id', blank=True, null=True)
+    video = models.ForeignKey('Video', on_delete=models.CASCADE, blank=True, null=True)
 
 
 

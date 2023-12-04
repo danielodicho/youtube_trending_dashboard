@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import generics
 from .models import Region, Category, Statistics, Video, YouTuber
-from .serializers import RegionSerializer, CategorySerializer, StatisticsSerializer, VideoSerializer, YouTuberSerializer
+from .serializers import RegionSerializer, CategorySerializer, StatisticsSerializer, VideoSerializer, YouTuberSerializer, StatisticsRawSerializer, VideoRawSerializer
 from rest_framework import viewsets
 from rest_framework import status
 
@@ -110,6 +110,42 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 class StatisticsViewSet(viewsets.ModelViewSet):
     serializer_class = StatisticsSerializer
+    # serializer_class = StatisticsRawSerializer
+
+    def create(self, request):
+        # Extract the fields from the request
+        statistic_id = request.data.get('statistic_id')
+        publishedAt = request.data.get('publishedAt')
+        trending_date = request.data.get('trending_date')
+        view_count = request.data.get('view_count')
+        comment_count = request.data.get('comment_count')
+        likes = request.data.get('likes')
+        dislikes = request.data.get('dislikes')
+        video_id = request.data.get('video_id')
+
+        # Simple validation: Check if all necessary fields are provided
+        if not all([statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video_id]):
+            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # SQL Query to insert a new statistics record
+        sql_query = """
+            INSERT INTO youtube_statistics (statistic_id, publishedAt, trending_date, view_count, 
+                                            comment_count, likes, dislikes, video_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        with connections['default'].cursor() as cursor:
+            try:
+                cursor.execute(sql_query, [statistic_id, publishedAt, trending_date, view_count, comment_count, likes, dislikes, video_id])
+            except Exception as e:
+                # Handle specific exceptions if needed and return a corresponding response
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': 'Statistics created'}, status=status.HTTP_201_CREATED)
+
+        
+
+
+
 
     def get_queryset(self):
         sql_query = """
@@ -151,38 +187,64 @@ class StatisticsViewSet(viewsets.ModelViewSet):
         if result is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        data = {'statistic_id': result[0], 
-                'publishedAt': result[1],
-                'trending_date': result[2],
-                'view_count': result[3],
-                'comment_count': result[4],
-                'likes': result[5],
-                'dislikes': result[6],
-                'video': result[7]}
-        serializer = self.serializer_class(data)
-        return Response(serializer.data)
+        data = {
+            'statistic_id': result[0], 
+            'publishedAt': result[1],
+            'trending_date': result[2],
+            'view_count': result[3],
+            'comment_count': result[4],
+            'likes': result[5],
+            'dislikes': result[6],
+            'video_id': result[7]
+        }
 
-    # def update(self, request, pk=None):
-    #     video = request.data.get('video')
+        # serializer = self.serializer_class(data)
+        serializer = StatisticsRawSerializer(data=data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #     if not video:
-    #         return Response({'error': 'Video name is required'}, status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, pk=None):
+        # Extract the fields from the request
+        publishedAt = request.data.get('publishedAt')
+        trending_date = request.data.get('trending_date')
+        view_count = request.data.get('view_count')
+        comment_count = request.data.get('comment_count')
+        likes = request.data.get('likes')
+        dislikes = request.data.get('dislikes')
+        video = request.data.get('video_id')
 
-    #     sql_query = "UPDATE youtube_statistics SET video = %s WHERE statistic_id = %s;"
-    #     with connections['default'].cursor() as cursor:
-    #         cursor.execute(sql_query, [video, pk])
-    #         if cursor.rowcount == 0:
-    #             return Response(status=status.HTTP_404_NOT_FOUND)
+        # Simple validation: Check if all necessary fields are provided
+        if not all([publishedAt, trending_date, view_count, comment_count, likes, dislikes, video]):
+            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    #     return Response({'status': 'Statistics updated'})
+        # SQL Query to update the statistics record
+        sql_query = """
+            UPDATE youtube_statistics
+            SET publishedAt = %s, trending_date = %s, view_count = %s, 
+                comment_count = %s, likes = %s, dislikes = %s, video_id = %s
+            WHERE statistic_id = %s;
+        """
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [publishedAt, trending_date, view_count, comment_count, likes, dislikes, video, pk])
+            if cursor.rowcount == 0:
+                return Response({'error': 'Statistics not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Statistics updated'})
+
     
-    # def destroy(self, request, pk=None):
-    #     sql_query = "DELETE FROM youtube_statistics WHERE statistic_id = %s;"
-    #     with connections['default'].cursor() as cursor:
-    #         cursor.execute(sql_query, [pk])
-    #         if cursor.rowcount == 0:
-    #             return Response(status=status.HTTP_404_NOT_FOUND)
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def destroy(self, request, pk=None):
+        # SQL Query to delete the statistics record
+        sql_query = "DELETE FROM youtube_statistics WHERE statistic_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            if cursor.rowcount == 0:
+                return Response({'error': 'Statistics not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Statistics deleted'}, status=status.HTTP_204_NO_CONTENT)
+
     
     
     
@@ -193,6 +255,37 @@ class StatisticsViewSet(viewsets.ModelViewSet):
 
 class VideoViewSet(viewsets.ModelViewSet):
     serializer_class = VideoSerializer
+
+    def create(self, request):
+        # Extract the fields from the request
+        video_id = request.data.get('video_id')
+        title = request.data.get('title')
+        thumbnail_link = request.data.get('thumbnail_link')
+        comments_disabled = request.data.get('comments_disabled')
+        ratings_disabled = request.data.get('ratings_disabled')
+        channel_id = request.data.get('channel_id')
+        region_id = request.data.get('region_id')
+        category_id = request.data.get('category_id')
+        # Simple validation: Check if all necessary fields are provided
+        # if not all([video_id, title, channel_id, region_id, category_id]):
+        #     return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # SQL Query to insert a new video record
+        sql_query = """
+            INSERT INTO youtube_video (video_id, title, thumbnail_link, comments_disabled, 
+                                    ratings_disabled, channel_id, region_id, category_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s);
+        """
+        with connections['default'].cursor() as cursor:
+            try:
+                cursor.execute(sql_query, [video_id, title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id])
+            except Exception as e:
+                # Handle specific exceptions if needed and return a corresponding response
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': 'Video created'}, status=status.HTTP_201_CREATED)
+
 
     def get_queryset(self):
         sql_query = """
@@ -208,9 +301,9 @@ class VideoViewSet(viewsets.ModelViewSet):
             video_id, title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id = item
 
             # Fetch related models
-            channel = YouTuber.objects.get(pk=channel_id)
-            region = Region.objects.get(pk=region_id)
-            category = Category.objects.get(pk=category_id)
+            # channel = YouTuber.objects.get(pk=channel_id)
+            # region = Region.objects.get(pk=region_id)
+            # category = Category.objects.get(pk=category_id)
 
             video_data = {
                 'video_id': video_id,
@@ -218,9 +311,9 @@ class VideoViewSet(viewsets.ModelViewSet):
                 'thumbnail_link': thumbnail_link,
                 'comments_disabled': bool(comments_disabled),
                 'ratings_disabled': bool(ratings_disabled),
-                'channel': channel,
-                'region': region,
-                'category': category,
+                'channel_id': channel_id,
+                'region_id': region_id,
+                'category_id': category_id,
             }
 
             data.append(video_data)
@@ -228,47 +321,78 @@ class VideoViewSet(viewsets.ModelViewSet):
         return data
 
     def retrieve(self, request, pk=None):
-        sql_query = "SELECT * FROM youtube_video WHERE video_id = %s;"
+        sql_query = """
+            SELECT video_id, title, thumbnail_link, comments_disabled, ratings_disabled, 
+                   channel_id, region_id, category_id
+            FROM youtube_video
+            WHERE video_id = %s;
+        """
         with connections['default'].cursor() as cursor:
             cursor.execute(sql_query, [pk])
             result = cursor.fetchone()
 
+        temp = "https://i.ytimg.com/vi/5qap5aO4i9A/default.jpg"
         if result is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        if result[2]:
+            temp = result[2]
+        data = {
+            'video_id': result[0], 
+            'title': result[1],
+            'thumbnail_link': temp,
+            'comments_disabled': result[3],
+            'ratings_disabled': result[4],
+            'channel_id': result[5],  # Assuming the raw SQL provides the channel_id
+            'region_id': result[6],   # Assuming the raw SQL provides the region_id
+            'category_id': result[7]  # Assuming the raw SQL provides the category_id
+        }
 
-        data = {'video_id': result[0], 
-                'title': result[1],
-                'thumbnail_link': result[2],
-                'comments_disabled': result[3],
-                'ratings_disabled': result[4],
-                'channel': result[5],
-                'region': result[6],
-                'category': result[7]}
-        serializer = self.serializer_class(data)
-        return Response(serializer.data)
 
-    # def update(self, request, pk=None):
-    #     title = request.data.get('title')
+        serializer = VideoRawSerializer(data=data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    #     if not title:
-    #         return Response({'error': 'Title is required'}, status=status.HTTP_400_BAD_REQUEST)
+    def update(self, request, pk=None):
+        # Extract the fields from the request
+        title = request.data.get('title')
+        thumbnail_link = request.data.get('thumbnail_link')
+        comments_disabled = request.data.get('comments_disabled')
+        ratings_disabled = request.data.get('ratings_disabled')
+        channel_id = request.data.get('channel_id')
+        region_id = request.data.get('region_id')
+        category_id = request.data.get('category_id')
 
-    #     sql_query = "UPDATE youtube_video SET title = %s WHERE video_id = %s;"
-    #     with connections['default'].cursor() as cursor:
-    #         cursor.execute(sql_query, [title, pk])
-    #         if cursor.rowcount == 0:
-    #             return Response(status=status.HTTP_404_NOT_FOUND)
+        # Simple validation: Check if all necessary fields are provided
+        if not all([title, thumbnail_link, channel_id, region_id, category_id]):
+            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-    #     return Response({'status': 'Title updated'})
+        # SQL Query to update the video record
+        sql_query = """
+            UPDATE youtube_video
+            SET title = %s, thumbnail_link = %s, comments_disabled = %s, 
+                ratings_disabled = %s, channel_id = %s, region_id = %s, category_id = %s
+            WHERE video_id = %s;
+        """
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [title, thumbnail_link, comments_disabled, ratings_disabled, channel_id, region_id, category_id, pk])
+            if cursor.rowcount == 0:
+                return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Video updated'})
+
     
-    # def destroy(self, request, pk=None):
-    #     sql_query = "DELETE FROM youtube_video WHERE video_id = %s;"
-    #     with connections['default'].cursor() as cursor:
-    #         cursor.execute(sql_query, [pk])
-    #         if cursor.rowcount == 0:
-    #             return Response(status=status.HTTP_404_NOT_FOUND)
+    def destroy(self, request, pk=None):
+        # SQL Query to delete the video record
+        sql_query = "DELETE FROM youtube_video WHERE video_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            if cursor.rowcount == 0:
+                return Response({'error': 'Video not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'status': 'Video deleted'}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 
@@ -283,11 +407,46 @@ class YouTuberViewSet(viewsets.ModelViewSet):
             cursor.execute(sql_query)
             result = cursor.fetchall()
 
-        # Transform the list of tuples into a list of dictionaries
+
         data = [{'channel_id': item[0], 'channel_title': item[1]} for item in result]
 
         return data
 
+    def retrieve(self, request, pk=None):
+        sql_query = "SELECT * FROM youtube_youtuber WHERE channel_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            result = cursor.fetchone()
+
+        if result is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = {'channel_id': result[0], 'channel_title': result[1]}
+        serializer = self.serializer_class(data)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        channel_title = request.data.get('channel_title')
+
+        if not channel_title:
+            return Response({'error': 'Channel name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        sql_query = "UPDATE youtube_youtuber SET channel_title = %s WHERE channel_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [channel_title, pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'status': 'Channel updated'})
+    
+    def destroy(self, request, pk=None):
+        sql_query = "DELETE FROM youtube_youtuber WHERE channel_id = %s;"
+        with connections['default'].cursor() as cursor:
+            cursor.execute(sql_query, [pk])
+            if cursor.rowcount == 0:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
