@@ -72,14 +72,6 @@ class Update extends React.Component {
     } else {
       console.error("Invalid file name. Only 'video', 'statistic' or 'youtuber' file is allowed.");
     }
-  
-    // axios.put(`http://localhost:8000/videos/${video.video_id}/`, video)
-    //   .then(response => {
-    //     console.log(`Video with ID ${video.video_id} updated successfully.`, response);
-    //   })
-    //   .catch(error => {
-    //     console.error(`Error updating video with ID ${video.video_id}:`, error.response.data);
-    //   });
   }  
 
   render() {
