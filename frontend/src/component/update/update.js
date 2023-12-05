@@ -54,7 +54,7 @@ class Update extends React.Component {
           console.error("Error adding videos:", error);
         });
     } else if (fileName.toLowerCase() === 'statistic.txt') {
-      axios.put(`http://localhost:8000/statistics/${videosData.statistics_id}/`, videosData)
+      axios.put(`http://localhost:8000/statistics/${videosData.statistic_id}/`, videosData)
         .then(response => {
           console.log("Videos changed successfully:", response.data);
         })
