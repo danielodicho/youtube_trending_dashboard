@@ -172,7 +172,7 @@ class Search extends Component {
           <div className="searchbar">
             <Input
               onChange={this.searchHandler}
-              placeholder='Search for YouTuber here'
+              placeholder='Search for YouTube Title'
               value={this.state.value}
               className="searchbar-input"
             />

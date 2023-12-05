@@ -37,7 +37,7 @@ class Table extends Component {
           <div className="columnHeader">
             <span>Channel Name</span>
             {youtubeData.map((data, index) => (
-              <div key={index}>{data.channel_title}</div>
+              <div key={index}>{data.channel_title !== undefined ? data.channel_title.slice(0, -2) : ''}</div>
             ))}
           </div>
           <div className="columnHeader">
