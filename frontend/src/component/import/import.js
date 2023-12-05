@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import './import.scss';
 
 class Import extends React.Component {
@@ -27,32 +28,60 @@ class Import extends React.Component {
 
   readFile(file) {
     const reader = new FileReader();
-
+  
     reader.onload = (e) => {
       const content = e.target.result;
       try {
         const videosData = JSON.parse(content);
-        this.processVideosData(videosData);
+  
+        if (this.isVideoDataValid(videosData)) {
+          this.processVideosData(videosData, file.name);
+        } else {
+          console.error("Invalid video data format");
+        }
       } catch (error) {
         console.error("Error parsing JSON file:", error);
       }
     };
-
+  
     reader.readAsText(file);
   }
 
-  processVideosData(videosData) {
-    // Here you can access the fields like video_title, views, trending_data, etc.
-    console.log("Video Title:", videosData.video_title);
-    console.log("Views:", videosData.views);
-    console.log("Trending Data:", videosData.trending_data);
-    console.log("Category ID:", videosData.category_id);
-    console.log("Channel Title:", videosData.channel_title);
-    console.log("Views Likes Ratio:", videosData.views_likes_ratio);
-    console.log("Click Rate:", videosData.click_rate);
-    console.log("Tags:", videosData.tags);
+  isVideoDataValid(videosData) {
+    // Check if the imported data matches the expected structure for a single video information
+    return videosData && !Array.isArray(videosData);
+  }
 
-    // Insert video to database here???
+  processVideosData(videosData, fileName) {
+    console.log(videosData);
+    // Check if the file name is 'videos' before making the axios post request
+    if (fileName.toLowerCase() === 'video.txt') {
+      axios.post('http://localhost:8000/videos/', videosData)
+        .then(response => {
+          console.log("Videos added successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'statistic.txt') {
+      axios.post('http://localhost:8000/statistics/', videosData)
+        .then(response => {
+          console.log("Videos added successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'youtuber.txt') {
+      axios.post('http://localhost:8000/youtubers/', videosData)
+        .then(response => {
+          console.log("Videos added successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else {
+      console.error("Invalid file name. Only 'video', 'statistic' or 'youtuber' file is allowed.");
+    }
   }
 
   render() {

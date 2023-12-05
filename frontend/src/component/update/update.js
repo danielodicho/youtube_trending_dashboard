@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import './update.scss';
 
 class Update extends React.Component {
@@ -32,7 +33,7 @@ class Update extends React.Component {
       const content = e.target.result;
       try {
         const videosData = JSON.parse(content);
-        this.processVideosData(videosData);
+        this.processVideosData(videosData, file.name);
       } catch (error) {
         console.error("Error parsing JSON file:", error);
       }
@@ -41,19 +42,37 @@ class Update extends React.Component {
     reader.readAsText(file);
   }
 
-  processVideosData(videosData) {
-    // Here you can access the fields like video_title, views, trending_data, etc.
-    console.log("Video Title:", videosData.video_title);
-    console.log("Views:", videosData.views);
-    console.log("Trending Data:", videosData.trending_data);
-    console.log("Category ID:", videosData.category_id);
-    console.log("Channel Title:", videosData.channel_title);
-    console.log("Views Likes Ratio:", videosData.views_likes_ratio);
-    console.log("Click Rate:", videosData.click_rate);
-    console.log("Tags:", videosData.tags);
+  processVideosData(videosData, fileName) {
+    console.log("Sending video data:", videosData); // Log the data being sent
 
-    // Insert video to database here???
-  }
+    if (fileName.toLowerCase() === 'video.txt') {
+      axios.put(`http://localhost:8000/videos/${videosData.video_id}/`, videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'statistic.txt') {
+      axios.put(`http://localhost:8000/statistics/${videosData.statistic_id}/`, videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'youtuber.txt') {
+      axios.put(`http://localhost:8000/youtubers/${videosData.channel_id}/`, videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else {
+      console.error("Invalid file name. Only 'video', 'statistic' or 'youtuber' file is allowed.");
+    }
+  }  
 
   render() {
     return (
@@ -73,7 +92,7 @@ class Update extends React.Component {
           type="file"
           style={{ display: 'none' }}
           ref={this.fileInputRef}
-          key={this.state.file} // Reset the input when key changes
+          key={this.state.file}
           onChange={this.handleFileChange}
         />
       </div>

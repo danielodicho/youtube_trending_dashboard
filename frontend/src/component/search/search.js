@@ -132,6 +132,29 @@ class Search extends Component {
     // Handle the imported data
   };
 
+  handleDelete = async () => {
+    const { videoList } = this.state;
+  
+    const deletePromises = videoList.map(video => {
+      // Check if the video has a valid id
+      if (video.video_id) {
+        return axios.delete(`http://localhost:8000/videos/${video.video_id}/`);
+      } else {
+        // If no valid id, log an error or handle as appropriate
+        console.error('Invalid video ID:', video);
+        return Promise.resolve(); // Resolve the promise to continue with other deletions
+      }
+    });
+  
+    try {
+      await Promise.all(deletePromises);
+      this.setState({ videoList: [] });
+      console.log('All valid videos have been deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting videos:', error);
+    }
+  };  
+
   render() {
     return (
       <div>
