@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import './update.scss';
 
 class Update extends React.Component {
@@ -41,19 +42,17 @@ class Update extends React.Component {
     reader.readAsText(file);
   }
 
-  processVideosData(videosData) {
-    // Here you can access the fields like video_title, views, trending_data, etc.
-    console.log("Video Title:", videosData.video_title);
-    console.log("Views:", videosData.views);
-    console.log("Trending Data:", videosData.trending_data);
-    console.log("Category ID:", videosData.category_id);
-    console.log("Channel Title:", videosData.channel_title);
-    console.log("Views Likes Ratio:", videosData.views_likes_ratio);
-    console.log("Click Rate:", videosData.click_rate);
-    console.log("Tags:", videosData.tags);
-
-    // Insert video to database here???
-  }
+  processVideosData(video) {
+    console.log("Sending video data:", video); // Log the data being sent
+  
+    axios.put(`http://localhost:8000/videos/${video.video_id}/`, video)
+      .then(response => {
+        console.log(`Video with ID ${video.video_id} updated successfully.`, response);
+      })
+      .catch(error => {
+        console.error(`Error updating video with ID ${video.video_id}:`, error.response.data);
+      });
+  }  
 
   render() {
     return (
@@ -73,7 +72,7 @@ class Update extends React.Component {
           type="file"
           style={{ display: 'none' }}
           ref={this.fileInputRef}
-          key={this.state.file} // Reset the input when key changes
+          key={this.state.file}
           onChange={this.handleFileChange}
         />
       </div>
