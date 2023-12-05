@@ -33,7 +33,7 @@ class Update extends React.Component {
       const content = e.target.result;
       try {
         const videosData = JSON.parse(content);
-        this.processVideosData(videosData);
+        this.processVideosData(videosData, file.name);
       } catch (error) {
         console.error("Error parsing JSON file:", error);
       }
@@ -42,16 +42,44 @@ class Update extends React.Component {
     reader.readAsText(file);
   }
 
-  processVideosData(video) {
-    console.log("Sending video data:", video); // Log the data being sent
+  processVideosData(videosData, fileName) {
+    console.log("Sending video data:", videosData); // Log the data being sent
+
+    if (fileName.toLowerCase() === 'video.txt') {
+      axios.put('http://localhost:8000/videos/${videosData.video_id}/', videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'statistic.txt') {
+      axios.put('http://localhost:8000/statistics/${videosData.statistics_id}/', videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else if (fileName.toLowerCase() === 'youtuber.txt') {
+      axios.post('http://localhost:8000/youtubers/${videosData.channel_id}', videosData)
+        .then(response => {
+          console.log("Videos changed successfully:", response.data);
+        })
+        .catch(error => {
+          console.error("Error adding videos:", error);
+        });
+    } else {
+      console.error("Invalid file name. Only 'video', 'statistic' or 'youtuber' file is allowed.");
+    }
   
-    axios.put(`http://localhost:8000/videos/${video.video_id}/`, video)
-      .then(response => {
-        console.log(`Video with ID ${video.video_id} updated successfully.`, response);
-      })
-      .catch(error => {
-        console.error(`Error updating video with ID ${video.video_id}:`, error.response.data);
-      });
+    // axios.put(`http://localhost:8000/videos/${video.video_id}/`, video)
+    //   .then(response => {
+    //     console.log(`Video with ID ${video.video_id} updated successfully.`, response);
+    //   })
+    //   .catch(error => {
+    //     console.error(`Error updating video with ID ${video.video_id}:`, error.response.data);
+    //   });
   }  
 
   render() {
