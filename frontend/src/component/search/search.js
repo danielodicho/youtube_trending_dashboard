@@ -4,6 +4,7 @@ import axios from 'axios';
 import Import from '../import/import';
 import Update from '../update/update';
 import Delete from '../delete/delete';
+import Analysis from '../analysis/analysis';
 
 import Table from '../table/table'; 
 
@@ -27,6 +28,7 @@ class Search extends Component {
       videoList: [],
       sort: 'name',
       order: 'Ascending',
+      showAnalysis: false,
     };
 
     this.baseUrl = 'http://localhost:8000/videos/';
@@ -34,11 +36,16 @@ class Search extends Component {
     this.clickHandler = this.clickHandler.bind(this);
     this.sortHandler = this.sortHandler.bind(this);
     this.orderHandler = this.orderHandler.bind(this);
+    this.toggleDisplay = this.toggleDisplay.bind(this);
   }
 
   componentDidMount() {
     // Fetch videos when the component mounts
     this.clickHandler();
+  }
+
+  toggleDisplay() {
+    this.setState(prevState => ({ showAnalysis: !prevState.showAnalysis }));
   }
 
   async clickHandler() {
@@ -132,14 +139,40 @@ class Search extends Component {
     // Handle the imported data
   };
 
+  handleDelete = async () => {
+    const { videoList } = this.state;
+  
+    const deletePromises = videoList.map(video => {
+      // Check if the video has a valid id
+      if (video.video_id) {
+        return axios.delete(`http://localhost:8000/videos/${video.video_id}/`);
+      } else {
+        // If no valid id, log an error or handle as appropriate
+        console.error('Invalid video ID:', video);
+        return Promise.resolve(); // Resolve the promise to continue with other deletions
+      }
+    });
+  
+    try {
+      await Promise.all(deletePromises);
+      this.setState({ videoList: [] });
+      console.log('All valid videos have been deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting videos:', error);
+    }
+  };  
+
   render() {
+    if (this.state.showAnalysis) {
+      return <Analysis />;
+    }
     return (
       <div>
         <div className="search-container">
           <div className="searchbar">
             <Input
               onChange={this.searchHandler}
-              placeholder='Search for YouTuber here'
+              placeholder='Search for YouTube Title'
               value={this.state.value}
               className="searchbar-input"
             />
@@ -186,6 +219,9 @@ class Search extends Component {
         <div className="import-update-container">
           <Import />
           <Update />
+          <button onClick={this.toggleDisplay} className='import-button'>
+            Go to Analysis
+          </button>
         </div>
 
 
