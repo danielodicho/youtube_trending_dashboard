@@ -4,11 +4,11 @@ import axios from 'axios';
 import Import from '../import/import';
 import Update from '../update/update';
 import Delete from '../delete/delete';
-import Analysis from '../analysis/analysis';
+import Search from '../search/search';
 
-import Table from '../table/table'; 
+import AnalysisTable from '../analysisTable/analysisTable'; 
 
-import './search.scss';
+import './analysis.scss';
 
 const sortOptions = [
   { key: 'title', text: 'Title', value: 'title' },
@@ -18,7 +18,7 @@ const sortOptions = [
   { key: 'channelTitle', text: 'ChannelName', value: 'channelTitle' },
 ];
 
-class Search extends Component {
+class Analysis extends Component {
   
   constructor() {
     super();
@@ -65,11 +65,11 @@ class Search extends Component {
       const categoriesData = categoriesResponse.data;
   
       // Merge videos with statistics, youtubers, and categories
-      const mergedData = videosData.map(video => {
-        const stats = statsData.find(stat => stat.video === video.video_id);
+      const mergedData = statsData.map(stat => {
+        const video = videosData.find(video => video.video_id === stat.video);
         const youtuber = youtubersData.find(youtuber => youtuber.channel_id === video.channel);
         const category = categoriesData.find(cat => cat.category_id === video.category);
-        return { ...video, ...stats, ...youtuber, ...category};
+        return { ...stat, ...video, ...youtuber, ...category};
       });
   
       // Apply search filter and update state
@@ -142,13 +142,13 @@ class Search extends Component {
   handleDelete = async () => {
     const { videoList } = this.state;
   
-    const deletePromises = videoList.map(video => {
+    const deletePromises = videoList.map(stats => {
       // Check if the video has a valid id
-      if (video.video_id) {
-        return axios.delete(`http://localhost:8000/videos/${video.video_id}/`);
+      if (stats.video) {
+        return axios.delete(`http://localhost:8000/statistics/${stats.statistic_id}/`);
       } else {
         // If no valid id, log an error or handle as appropriate
-        console.error('Invalid video ID:', video);
+        console.error('Invalid stat ID:', stats);
         return Promise.resolve(); // Resolve the promise to continue with other deletions
       }
     });
@@ -164,7 +164,7 @@ class Search extends Component {
 
   render() {
     if (this.state.showAnalysis) {
-      return <Analysis />;
+      return <Search />;
     }
     return (
       <div>
@@ -220,15 +220,15 @@ class Search extends Component {
           <Import />
           <Update />
           <button onClick={this.toggleDisplay} className='import-button'>
-            Go to Analysis
+            Back to Default
           </button>
         </div>
 
 
-        <Table youtubeData={this.state.videoList} />
+        <AnalysisTable youtubeData={this.state.videoList} />
       </div>
     );
   }
 }
 
-export default Search;
+export default Analysis;
