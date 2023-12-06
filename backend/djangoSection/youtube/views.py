@@ -120,6 +120,22 @@ class StatisticsViewSet(viewsets.ModelViewSet):
     serializer_class = StatisticsSerializer
     # serializer_class = StatisticsRawSerializer
 
+
+    @action(detail=False, methods=['get'])
+    def for_review(self, request):
+        query = """
+            SELECT DISTINCT v.video_id
+            FROM youtube_video v
+            JOIN youtube_statistics s ON v.video_id = s.video_id
+            WHERE s.dislikes > s.likes * 2;
+        """
+
+        with connections['default'].cursor() as cursor:
+            cursor.execute(query)
+            videos_for_review = cursor.fetchall()
+
+        return Response({'videos_for_review': [video[0] for video in videos_for_review]})
+
     def create(self, request):
         # Extract the fields from the request
         statistic_id = request.data.get('statistic_id')
@@ -466,6 +482,8 @@ class YouTuberViewSet(viewsets.ModelViewSet):
             columns = [col[0] for col in cursor.description]
             result = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
+            
+
         return Response(result)
 
     def get_queryset(self):
@@ -551,7 +569,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        # Your existing dependencies here
+        ('youtube')
     ]
 
     operations = [
@@ -629,5 +647,18 @@ class Migration(migrations.Migration):
                     FROM YouTuber
                     WHERE channelTitle LIKE CONCAT(search_string, '%');
                 END //
-                """)
+                """),
+                migrations.RunSQL("""
+            DROP TRIGGER IF EXISTS flag_video_for_review; -- Drop if it already exists
+            CREATE TRIGGER flag_video_for_review 
+            AFTER UPDATE ON youtube_statistics 
+            FOR EACH ROW
+            BEGIN
+                IF NEW.dislikes > NEW.likes * 2 THEN
+                    UPDATE youtube_video SET status = 'review' WHERE video_id = NEW.video_id;
+                END IF;
+            END;
+        """)
+
+            
     ]
