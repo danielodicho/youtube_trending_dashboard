@@ -59,7 +59,8 @@ class Search extends Component {
   }
 
   showPopular() {
-    this.setState(prevState => ({ controversial: !prevState.controversial }));
+    console.log("WTF");
+    this.setState(prevState => ({ popular: !prevState.popular }));
     this.clickHandler();
   }
 
@@ -82,10 +83,12 @@ class Search extends Component {
         const badVideosResponse = await axios.get('http://localhost:8000/statistics/for_review/');
         const badVideos = badVideosResponse.data.videos_for_review;
         videosData = videosData.filter(video => badVideos.includes(video.video_id));
-      } else if (this.state.popular) {
-        const badVideosResponse = await axios.get('http://localhost:8000/videos/get_popular_videos/');
-        const badVideos = badVideosResponse.data.videos_for_review;
-        videosData = videosData.filter(video => badVideos.includes(video.video_id));
+      } 
+      if (this.state.popular) {
+        console.log("HERE");
+        const popularVideosResponse = await axios.get('http://localhost:8000/videos/get_popular_videos/');
+        const popularVideos = popularVideosResponse.data.map(video => video.video_id);
+        videosData = videosData.filter(video => popularVideos.includes(video.video_id));
       }
 
       const statsData = statsResponse.data;
@@ -260,7 +263,7 @@ class Search extends Component {
             onClick={this.showPopular}
             className='controversial-button'
           >
-            {this.state.controversial ? 'Hide Popular Videos' : 'Show Popular Videos'}
+            {this.state.popular ? 'Hide Popular Videos' : 'Show Popular Videos'}
           </button>
         </div>
 
