@@ -30,7 +30,8 @@ class Search extends Component {
       sort: 'name',
       order: 'Ascending',
       showAnalysis: false,
-      controversial: false
+      controversial: false,
+      popular: false
     };
 
     this.baseUrl = 'http://localhost:8000/videos/';
@@ -40,6 +41,7 @@ class Search extends Component {
     this.orderHandler = this.orderHandler.bind(this);
     this.toggleDisplay = this.toggleDisplay.bind(this);
     this.controversialDisplay = this.controversialDisplay.bind(this);
+    this.showPopular = this.showPopular.bind(this);
   }
 
   componentDidMount() {
@@ -52,6 +54,11 @@ class Search extends Component {
   }
 
   controversialDisplay() {
+    this.setState(prevState => ({ controversial: !prevState.controversial }));
+    this.clickHandler();
+  }
+
+  showPopular() {
     this.setState(prevState => ({ controversial: !prevState.controversial }));
     this.clickHandler();
   }
@@ -73,6 +80,10 @@ class Search extends Component {
       if (this.state.controversial) {
         // Fetch bad videos for review
         const badVideosResponse = await axios.get('http://localhost:8000/statistics/for_review/');
+        const badVideos = badVideosResponse.data.videos_for_review;
+        videosData = videosData.filter(video => badVideos.includes(video.video_id));
+      } else if (this.state.popular) {
+        const badVideosResponse = await axios.get('http://localhost:8000/videos/get_popular_videos/');
         const badVideos = badVideosResponse.data.videos_for_review;
         videosData = videosData.filter(video => badVideos.includes(video.video_id));
       }
@@ -244,6 +255,12 @@ class Search extends Component {
             className='controversial-button'
           >
             {this.state.controversial ? 'Hide Controversial Videos' : 'Show Controversial Videos'}
+          </button>
+          <button
+            onClick={this.showPopular}
+            className='controversial-button'
+          >
+            {this.state.controversial ? 'Hide Popular Videos' : 'Show Popular Videos'}
           </button>
         </div>
 
