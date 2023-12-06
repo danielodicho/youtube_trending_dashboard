@@ -5,6 +5,7 @@ import Import from '../import/import';
 import Update from '../update/update';
 import Delete from '../delete/delete';
 import Analysis from '../analysis/analysis';
+import Controversial from '../controversial/controversial';
 
 import Table from '../table/table'; 
 
@@ -29,6 +30,7 @@ class Search extends Component {
       sort: 'name',
       order: 'Ascending',
       showAnalysis: false,
+      controversial: false
     };
 
     this.baseUrl = 'http://localhost:8000/videos/';
@@ -37,6 +39,7 @@ class Search extends Component {
     this.sortHandler = this.sortHandler.bind(this);
     this.orderHandler = this.orderHandler.bind(this);
     this.toggleDisplay = this.toggleDisplay.bind(this);
+    this.controversialDisplay = this.controversialDisplay.bind(this);
   }
 
   componentDidMount() {
@@ -46,6 +49,11 @@ class Search extends Component {
 
   toggleDisplay() {
     this.setState(prevState => ({ showAnalysis: !prevState.showAnalysis }));
+  }
+
+  controversialDisplay() {
+    this.setState(prevState => ({ controversial: !prevState.controversial }));
+    this.clickHandler();
   }
 
   async clickHandler() {
@@ -59,7 +67,16 @@ class Search extends Component {
       ]);
   
       // Extract data from responses
-      const videosData = videosResponse.data;
+      var videosData = videosResponse.data;
+
+      // Filter videosData based on badVideos IDs
+      if (this.state.controversial) {
+        // Fetch bad videos for review
+        const badVideosResponse = await axios.get('http://localhost:8000/statistics/for_review/');
+        const badVideos = badVideosResponse.data.videos_for_review;
+        videosData = videosData.filter(video => badVideos.includes(video.video_id));
+      }
+
       const statsData = statsResponse.data;
       const youtubersData = youtubersResponse.data;
       const categoriesData = categoriesResponse.data;
@@ -221,6 +238,12 @@ class Search extends Component {
           <Update />
           <button onClick={this.toggleDisplay} className='import-button'>
             Go to Analysis
+          </button>
+          <button
+            onClick={this.controversialDisplay}
+            className='controversial-button'
+          >
+            {this.state.controversial ? 'Hide Controversial Videos' : 'Show Controversial Videos'}
           </button>
         </div>
 
