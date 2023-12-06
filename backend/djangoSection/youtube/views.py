@@ -289,14 +289,17 @@ class VideoViewSet(viewsets.ModelViewSet):
         limit_rows = int(limit_rows)
 
         sql_query = """
-                    SELECT v.video_id, v.title, MAX(s.likes) AS likes
-                    FROM youtube_Video v
-                    JOIN youtube_Statistics s ON v.video_id = s.video_id
-                    GROUP BY v.video_id
-                    HAVING MAX(s.likes) >= %s
-                    ORDER BY MAX(s.likes) DESC
+                    SELECT v.video_id, v.title, agg_stats.max_likes, agg_stats.total_view_count
+                    FROM youtube_video v
+                    JOIN (
+                        SELECT s.video_id, MAX(s.likes) AS max_likes, SUM(s.view_count) AS total_view_count
+                        FROM youtube_statistics s
+                        GROUP BY s.video_id
+                    ) agg_stats ON v.video_id = agg_stats.video_id
+                    WHERE agg_stats.max_likes >= %s
+                    ORDER BY agg_stats.max_likes DESC
                     LIMIT %s;
-                """
+                    """
 
         with connections['default'].cursor() as cursor:
             cursor.execute(sql_query, [min_likes, limit_rows])
@@ -304,6 +307,7 @@ class VideoViewSet(viewsets.ModelViewSet):
             result = [dict(zip(columns, row)) for row in cursor.fetchall()]
 
         return Response(result)
+
 
 
 
@@ -407,9 +411,9 @@ class VideoViewSet(viewsets.ModelViewSet):
             'thumbnail_link': temp,
             'comments_disabled': result[3],
             'ratings_disabled': result[4],
-            'channel_id': result[5],  # Assuming the raw SQL provides the channel_id
-            'region_id': result[6],   # Assuming the raw SQL provides the region_id
-            'category_id': result[7]  # Assuming the raw SQL provides the category_id
+            'channel_id': result[5],
+            'region_id': result[6],  
+            'category_id': result[7]  
         }
 
 
@@ -574,70 +578,78 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL("""
-            CREATE PROCEDURE GetPopularVideos(IN minLikes INT, IN limitRows INT)
-            BEGIN
-                DECLARE video_id_var VARCHAR(255);
-                DECLARE video_title_var VARCHAR(255);
-                DECLARE video_likes_var INT;
-                DECLARE done BOOLEAN DEFAULT FALSE;  -- Declare 'done' variable
-                DECLARE counter INT DEFAULT 0;  -- Counter to limit the number of rows
+                            CREATE PROCEDURE GetPopularVideos(IN minLikes INT, IN limitRows INT)
+                BEGIN
+                    DECLARE video_id_var VARCHAR(255);
+                    DECLARE video_title_var VARCHAR(255);
+                    DECLARE video_likes_var INT;
+                    DECLARE video_views_var INT;
+                    DECLARE done BOOLEAN DEFAULT FALSE;  -- Declare 'done' variable
+                    DECLARE counter INT DEFAULT 0;  -- Counter to limit the number of rows
 
-                -- Declare and define a cursor for selecting videos
-                DECLARE video_cursor CURSOR FOR
-                    SELECT v.video_id, v.title, s.likes
-                    FROM Video v
-                    JOIN (
-                        SELECT video_id, MAX(likes) AS likes
-                        FROM Statistics
-                        GROUP BY video_id
-                    ) s ON v.video_id = s.video_id
-                    ORDER BY s.likes DESC;
+                    -- Declare and define a cursor for selecting videos
+                    DECLARE video_cursor CURSOR FOR
+                        SELECT v.video_id, v.title, s.likes, total_views.total_view_count
+                        FROM Video v
+                        JOIN (
+                            SELECT video_id, MAX(likes) AS likes
+                            FROM Statistics
+                            GROUP BY video_id
+                        ) s ON v.video_id = s.video_id
+                        JOIN (
+                            SELECT video_id, SUM(view_count) AS total_view_count
+                            FROM Statistics
+                            GROUP BY video_id
+                        ) total_views ON v.video_id = total_views.video_id
+                        ORDER BY s.likes DESC;
 
-                -- Declare continue handler for cursor
-                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+                    -- Declare continue handler for cursor
+                    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-                -- Open the cursor
-                OPEN video_cursor;
+                    -- Open the cursor
+                    OPEN video_cursor;
 
-                -- Create a temporary table to store results
-                CREATE TEMPORARY TABLE IF NOT EXISTS PopularVideos (
-                    video_id VARCHAR(255),
-                    video_title VARCHAR(255),
-                    likes INT
-                );
+                    -- Create a temporary table to store results
+                    CREATE TEMPORARY TABLE IF NOT EXISTS PopularVideos (
+                        video_id VARCHAR(255),
+                        video_title VARCHAR(255),
+                        likes INT,
+                        total_views INT
+                    );
 
-            -- Loop through the videos
-            video_loop: LOOP
-                -- Fetch data into variables
-                FETCH video_cursor INTO video_id_var, video_title_var, video_likes_var;
+                    -- Loop through the videos
+                    video_loop: LOOP
+                        -- Fetch data into variables
+                        FETCH video_cursor INTO video_id_var, video_title_var, video_likes_var, video_views_var;
 
-                -- Exit the loop if no more rows or reached the limit
-                IF done OR counter >= limitRows THEN
-                    LEAVE video_loop;
-                END IF;
+                        -- Exit the loop if no more rows or reached the limit
+                        IF done OR counter >= limitRows THEN
+                            LEAVE video_loop;
+                        END IF;
 
-                -- Check if the video has the required number of likes
-                IF video_likes_var >= minLikes THEN
-                    -- Insert the result into the temporary table
-                    INSERT INTO PopularVideos (video_id, video_title, likes)
-                    VALUES (video_id_var, video_title_var, video_likes_var);
+                        -- Check if the video has the required number of likes
+                        IF video_likes_var >= minLikes THEN
+                            -- Insert the result into the temporary table
+                            INSERT INTO PopularVideos (video_id, video_title, likes, total_views)
+                            VALUES (video_id_var, video_title_var, video_likes_var, video_views_var);
 
-                    -- Increment the counter
-                    SET counter = counter + 1;
-                END IF;
-            END LOOP video_loop;
+                            -- Increment the counter
+                            SET counter = counter + 1;
+                        END IF;
+                    END LOOP video_loop;
 
-            -- Close the cursor
-            CLOSE video_cursor;
+                    -- Close the cursor
+                    CLOSE video_cursor;
 
-            -- Select the results from the temporary table, ordered by likes in descending order
-            SELECT *
-            FROM PopularVideos
-            ORDER BY likes DESC;
+                    -- Select the results from the temporary table, ordered by likes in descending order
+                    SELECT *
+                    FROM PopularVideos
+                    ORDER BY likes DESC;
 
-            -- Drop the temporary table
-            DROP TEMPORARY TABLE IF EXISTS PopularVideos;
-            END //
+                    -- Drop the temporary table
+                    DROP TEMPORARY TABLE IF EXISTS PopularVideos;
+                END;
+
             """),
             migrations.RunSQL(
                 """
