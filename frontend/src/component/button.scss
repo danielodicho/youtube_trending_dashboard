@@ -1,6 +1,6 @@
-.import-button {
+.interactive-button {
   padding: 10px;
-  background-color: #3498db;
+  background-color: #4FC3A1;
   color: #fff;
   cursor: pointer;
   border: none;
@@ -8,7 +8,7 @@
   font-size: 16px;
 
   &:hover {
-    background-color: #2980b9;
+    background-color: #4FC3A1;
   }
 }
 
@@ -16,8 +16,8 @@
   display: none;
 }
 
-.import-container {
-  position: relative; /* or adjust as needed */
+.interactive-container {
+  position: relative;
   // top: 200px;
 }
 

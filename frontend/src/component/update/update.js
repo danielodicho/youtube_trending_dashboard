@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import './update.scss';
+import '../button.scss';
 
 class Update extends React.Component {
   constructor(props) {
@@ -76,10 +76,10 @@ class Update extends React.Component {
 
   render() {
     return (
-      <div className="import-container">
+      <div className="interactive-container">
         <button
-          id="import-button"
-          className="import-button"
+          id="interactive-button"
+          className="interactive-button"
           onClick={() => {
             this.fileInputRef.current.click();
             this.handleClick();

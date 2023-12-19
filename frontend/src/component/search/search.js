@@ -4,9 +4,9 @@ import axios from 'axios';
 import Import from '../import/import';
 import Update from '../update/update';
 import Delete from '../delete/delete';
-import Analysis from '../analysis/analysis';
-import Controversial from '../controversial/controversial';
+import'../button.scss'
 
+import AnalysisTable from '../analysisTable/analysisTable'; 
 import Table from '../table/table'; 
 
 import './search.scss';
@@ -39,7 +39,7 @@ class Search extends Component {
     this.clickHandler = this.clickHandler.bind(this);
     this.sortHandler = this.sortHandler.bind(this);
     this.orderHandler = this.orderHandler.bind(this);
-    this.toggleDisplay = this.toggleDisplay.bind(this);
+    this.analysisDisplay = this.analysisDisplay.bind(this);
     this.controversialDisplay = this.controversialDisplay.bind(this);
     this.showPopular = this.showPopular.bind(this);
   }
@@ -49,8 +49,9 @@ class Search extends Component {
     this.clickHandler();
   }
 
-  toggleDisplay() {
+  analysisDisplay() {
     this.setState(prevState => ({ showAnalysis: !prevState.showAnalysis }));
+    this.clickHandler();
   }
 
   controversialDisplay() {
@@ -59,7 +60,6 @@ class Search extends Component {
   }
 
   showPopular() {
-    console.log("WTF");
     this.setState(prevState => ({ popular: !prevState.popular }));
     this.clickHandler();
   }
@@ -85,7 +85,6 @@ class Search extends Component {
         videosData = videosData.filter(video => badVideos.includes(video.video_id));
       } 
       if (this.state.popular) {
-        console.log("HERE");
         const popularVideosResponse = await axios.get('http://localhost:8000/videos/get_popular_videos/');
         const popularVideos = popularVideosResponse.data.map(video => video.video_id);
         videosData = videosData.filter(video => popularVideos.includes(video.video_id));
@@ -94,14 +93,18 @@ class Search extends Component {
       const statsData = statsResponse.data;
       const youtubersData = youtubersResponse.data;
       const categoriesData = categoriesResponse.data;
-  
-      // Merge videos with statistics, youtubers, and categories
-      const mergedData = videosData.map(video => {
+
+      const mergedData = this.state.showAnalysis && !this.state.popular && !this.state.controversial ? statsData.map(stat => {
+        const video = videosData.find(video => video.video_id === stat.video);
+        const youtuber = youtubersData.find(youtuber => youtuber.channel_id === video.channel);
+        const category = categoriesData.find(cat => cat.category_id === video.category);
+        return { ...stat, ...video, ...youtuber, ...category};
+      }) : videosData.map(video => {
         const stats = statsData.find(stat => stat.video === video.video_id);
         const youtuber = youtubersData.find(youtuber => youtuber.channel_id === video.channel);
         const category = categoriesData.find(cat => cat.category_id === video.category);
         return { ...video, ...stats, ...youtuber, ...category};
-      });
+      });;
   
       // Apply search filter and update state
       const filteredList = mergedData.filter(video =>
@@ -194,9 +197,6 @@ class Search extends Component {
   };  
 
   render() {
-    if (this.state.showAnalysis) {
-      return <Analysis />;
-    }
     return (
       <div>
         <div className="search-container">
@@ -247,28 +247,27 @@ class Search extends Component {
           </span>
         </div>
 
-        <div className="import-update-container">
+        <div className="button-container">
           <Import />
           <Update />
-          <button onClick={this.toggleDisplay} className='import-button'>
-            Go to Analysis
+          <button onClick={this.analysisDisplay} className='interactive-button'>
+          {this.state.showAnalysis ? 'Back to Default' : 'Go to Analysis'}
           </button>
           <button
             onClick={this.controversialDisplay}
-            className='controversial-button'
+            className='interactive-button'
           >
             {this.state.controversial ? 'Hide Controversial Videos' : 'Show Controversial Videos'}
           </button>
           <button
             onClick={this.showPopular}
-            className='controversial-button'
+            className='interactive-button'
           >
             {this.state.popular ? 'Hide Popular Videos' : 'Show Popular Videos'}
           </button>
         </div>
-
-
-        <Table youtubeData={this.state.videoList} />
+        {/* <Table youtubeData={this.state.videoList} /> */}
+        {this.state.showAnalysis ? <AnalysisTable youtubeData={this.state.videoList}/> : <Table youtubeData={this.state.videoList} /> }
       </div>
     );
   }

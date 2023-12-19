@@ -33,28 +33,15 @@
 	cursor: pointer;
   }
 
-  .import-update-container {
+  .button-container {
 	display: flex;
-	justify-content:  flex-start;  // Update this line
-	margin: 10px 0;
+	justify-content:  flex-start;
+	margin: 20px 0;
   }
 
-  .import-button,
-  .update-button {
-	padding: 10px;
-	background-color: #3498db;
-	color: #fff;
-	cursor: pointer;
-	border: none;
-	border-radius: 5px;
-	font-size: 16px;
-  
-	&:hover {
-	  background-color: #2980b9;
-	}
-  }
+
   .delete-button {
-	background-color: #ff6347; // Red background color
+	background-color: #ff6347;
 	color: white;
 	border: none;
 	padding: 10px 20px;

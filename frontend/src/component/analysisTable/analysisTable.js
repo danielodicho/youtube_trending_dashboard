@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import './analysisTable.scss';
+import '../table/table.scss';
 
 class AnalysisTable extends Component {
   render() {
@@ -23,70 +23,61 @@ class AnalysisTable extends Component {
     });
 
     return (
-      <div className="tableContainer">
-        <div className="tableHeader">
-          {/* Each of these sections maps over the youtubeData array */}
-          <div className="columnHeader">
-            <span>Title</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.title}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Views (Daily Gain)</span>
+      <div class="table-wrapper">
+    <table class="fl-table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Views (Daily Gain)</th>
+            <th>Trending Date</th>
+            <th>Published Date</th>
+            <th>Category</th>
+            <th>Channel</th>
+            <th>Views/Likes Ratio</th>
+        </tr>
+        </thead>
+        <tbody>
             {dataWithDailyViews.map((data, index) => (
-              <div key={index}>
-                {data.view_count} 
-                {data.dailyViewsGained !== 'N/A' && (
+              <tr key={index}>
+              <td className="truncate-cell">
+                <div className="tooltip-container">
+                <span className="truncate-text">{data.title}</span>
+                  <span className="tooltip-text">
+                    {data.title}
+                    <br />
+                    <a href={`https://www.youtube.com/watch?v=${data.video_id}`} target="_blank" rel="noopener noreferrer">
+                      Watch Video
+                      </a>
+                    </span>
+                  </div>
+                  {/* {data.title} */}
+                </td>
+                <td>{data.view_count} 
+                 {data.dailyViewsGained !== 'N/A' && (
                   <span> (+{data.dailyViewsGained})</span>
-                )}
-              </div>
+                )}</td>
+                <td>{data.trending_date}</td>
+                <td>{data.publishedAt}</td>
+                <td>{data.category_name}</td>
+                <td className="truncate-cell">{data.channel_title !== undefined ? data.channel_title.slice(0, -2) : ''}</td>
+                <td>{data.view_count / data.likes}</td>
+              </tr>
             ))}
-          </div>
-          <div className="columnHeader">
-            <span>Trending Date</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.trending_date}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Published Date</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.publishedAt}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Category Name</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.category_name}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Channel Name</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.channel_title !== undefined ? data.channel_title.slice(0, -2) : ''}</div>
-            ))}
-          </div>
-          <div className="columnHeader">
-            <span>Views/Likes Ratio</span>
-            {youtubeData.map((data, index) => (
-              <div key={index}>{data.view_count / data.likes}</div>
-            ))}
-          </div>
-        </div>
-      </div>
+          </tbody>
+    </table>
+</div>
     );
   }
 }
 
-// Uncomment and update PropTypes
 AnalysisTable.propTypes = {
   youtubeData: PropTypes.arrayOf(
     PropTypes.shape({
       video_title: PropTypes.string,
+      video_id: PropTypes.string,
       views: PropTypes.number,
       trending_date: PropTypes.string,
-      category_id: PropTypes.string,
+      category_name: PropTypes.string,
       channel_title: PropTypes.string,
       views_likes_ratio: PropTypes.string,
       click_rate: PropTypes.number,
