@@ -1,4 +1,4 @@
-.interactive-button {
+.interactive-button, .import-button {
   padding: 10px;
   background-color: #4FC3A1;
   color: #fff;
@@ -11,6 +11,11 @@
     background-color: #4FC3A1;
   }
 }
+
+.import-button {
+  margin-left: 70px;
+}
+
 
 #file-input {
   display: none;

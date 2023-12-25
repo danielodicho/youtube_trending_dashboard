@@ -88,8 +88,8 @@ class Import extends React.Component {
     return (
       <div className="interactive-container">
         <button
-          id="interactive-button"
-          className="interactive-button"
+          id="import-button"
+          className="import-button"
           onClick={() => {
             this.fileInputRef.current.click();
             this.handleClick();
